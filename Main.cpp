@@ -1,6 +1,6 @@
-﻿
-#include <iostream>
+﻿#include <iostream>
 #include <list>
+#include <string>
 
 #include <SFML/Graphics.hpp>
 
@@ -38,8 +38,11 @@ int main()
 
     TestEventsWork test;
 
-    gui::Button btn(sf::Vector2f(0, 0), sf::Vector2f(100, 100), &window);
+    gui::TextBlock btn(sf::Vector2f(0, 0), "hello", &window);
     btn.addListener(&test);
+
+    btn.setColors(sf::Color::Green, sf::Color::Red);
+    btn.setCharacterSize(100);
 
     while (window.isOpen())
     {

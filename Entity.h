@@ -52,6 +52,11 @@ protected:
 
 public:
 
+	void setSize(const sf::Vector2f size)
+	{
+		size_ = size;
+	}
+
 	sf::Vector2f getSize() const
 	{
 		return size_;

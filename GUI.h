@@ -121,14 +121,78 @@ namespace gui
 		}
 	};
 
-	class Button : public Element
+	class TextBlock : public Element
 	{
-	public:
+	private:
 
-		Button(sf::Vector2f position, sf::Vector2f size, sf::RenderWindow* window) : Element(position, size, window)
+		sf::Vector2<sf::Color> colors_;
+		sf::Font font_;
+		mutable sf::Text text_;
+
+		std::string str_;
+		
+		bool enabled_;
+
+		void loadText()
 		{
+			font_.loadFromFile("data/CyrilicOld.TTF");
 
+			text_.setPosition(position_);
+			text_.setFont(font_);
+			text_.setFillColor(colors_.y);
+			text_.setString(str_);
+			text_.setCharacterSize(30);
 		}
 
+		void enter() const override
+		{
+			Element::enter();
+
+			text_.setFillColor(colors_.x);
+		}
+
+		void leave() const override
+		{
+			Element::leave();
+
+			text_.setFillColor(colors_.y);
+		}
+
+	public:
+
+		TextBlock(sf::Vector2f position, std::string text, sf::RenderWindow* window) : Element(position, {0, 0}, window),
+			str_(text),
+			enabled_(true),
+			colors_(sf::Vector2<sf::Color>(sf::Color::Red, sf::Color::Green))
+		{
+			loadText();
+			setSize(sf::Vector2f{ float (str_.size() * text_.getCharacterSize()), float (text_.getCharacterSize()) });
+		}
+
+		void setCharacterSize(const float size)
+		{
+			text_.setCharacterSize(size);
+			setSize(sf::Vector2f{ float(str_.size() * text_.getCharacterSize()), float(text_.getCharacterSize()) });
+		}
+
+		void setColors(sf::Color color_in_enter, sf::Color color_in_leave)
+		{
+			colors_ = { color_in_enter, color_in_leave };
+		}
+
+		void disableText()
+		{
+			enabled_ = false;
+		}
+
+		void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
+		{
+			if (enabled_)
+			{
+				Element::draw(target, animation_state);
+			}
+			
+			target.draw(text_);
+		}
 	};
 }
