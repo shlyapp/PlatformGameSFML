@@ -2,7 +2,8 @@
 
 enum class GameEventState
 {
-	inMenu,
+	None,
+	StartGame,
 	inGame,
 	PlayerDied,
 	SetNewLevel,
@@ -32,6 +33,28 @@ protected:
 		if (event != GAME_STATE)
 		{
 			GAME_STATE = event;
+
+			switch (GAME_STATE)
+			{
+			case GameEventState::StartGame:
+				std::cout << "start game!\n";
+				break;
+			case GameEventState::inGame:
+				std::cout << "in game!\n";
+				break;
+			case GameEventState::PlayerDied:
+				std::cout << "player died!\n";
+				break;
+			case GameEventState::SetNewLevel:
+				std::cout << "set new level!\n";
+				break;
+			case GameEventState::GameOver:
+				std::cout << "game over!\n";
+				break;
+			default:
+				break;
+			}
+
 
 			for (auto listener : listeners_)
 			{

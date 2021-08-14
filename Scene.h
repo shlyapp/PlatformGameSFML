@@ -4,29 +4,44 @@ class Scene : public sf::Drawable, public IGameEventListener
 {
 private:
 
-	Menu* menu_;
-	Map* map_;
+	enum SceneState
+	{
+		InMenu,
+		InGame,
+		GameOver
+	};
 
+	SceneState state_;
+
+	Menu* menu_;
+	Game* game_;
+
+	mutable sf::View view_;
+	
 public:
 
 	Scene(sf::RenderWindow* window) :
 		menu_(new Menu("data/images/menu.png", "data/images/info.png", window)),
-		map_(new Map(sf::Vector2f{ 26, 15 }, "data/images/textures.png", "data/maps/firstMap.txt"))
+		game_(new Game(window, &view_)),
+		state_(SceneState::InMenu)
 	{
 		menu_->addListener(this);
+		menu_->addListener(game_);
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 	{
-		switch (GAME_STATE)
+		switch (state_)
 		{
-		case GameEventState::inMenu:
+		case SceneState::InMenu:
 			target.draw(*menu_);
 			break;
-		case GameEventState::inGame:
-			target.draw(*map_);
+		case SceneState::InGame:
+			view_.reset(sf::FloatRect(0, 0, 550, 400));
+			target.draw(*game_);
+			target.setView(view_);
 			break;
-		case GameEventState::GameOver:
+		case SceneState::GameOver:
 			break;
 		default:
 			break;
@@ -35,7 +50,15 @@ public:
 
 	void updateByGameEvent(GameEventState event) override
 	{
-		
+		if (event == GameEventState::StartGame)
+		{
+			state_ = SceneState::InGame;
+		}
+		if (event == GameEventState::GameOver)
+		{
+			state_ = SceneState::GameOver;
+		}
 	}
+
 };
 

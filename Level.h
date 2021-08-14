@@ -241,9 +241,14 @@ private:
 			notifyListeners(GameEventState::GameOver);
 		}
 
+		void loadNewLevel()
+		{
+			notifyListeners(GameEventState::SetNewLevel);
+		}
+
 	};
 
-	inline static int num_level_ = 0;
+	inline static int num_level_ = -1;
 
 	inline static std::vector<Level*> levels_;
 
@@ -256,7 +261,7 @@ private:
 
 public:
 
-	static inline Level* level = levels_[num_level_];
+	static inline Level* level;
 
 	static void addLevel(Level* level)
 	{
@@ -270,6 +275,7 @@ public:
 		if (num_level_ <= levels_.size() - 1)
 		{
 			level = levels_[num_level_];
+			nt.loadNewLevel();
 			return;
 		}
 		

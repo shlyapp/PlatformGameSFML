@@ -72,7 +72,7 @@ public:
 		}
 		if (element == start_game_ && event == gui::EventType::Click)
 		{
-			notifyListeners(GameEventState::inGame);
+			notifyListeners(GameEventState::StartGame);
 		}
 	}
 };
