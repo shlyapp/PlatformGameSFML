@@ -10,14 +10,19 @@
 
 #include "Entity.h"
 #include "GUI.h"
+#include "GameEvent.h"
+
 #include "InterfaceUI.h"
+
+#include "Game.h"
+#include "Scene.h"
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "YouGame");
     window.setFramerateLimit(60);
 
-    Menu menu("data/images/menu.png", "data/images/info.png", &window);
+    Scene scene(&window);
 
     while (window.isOpen())
     {
@@ -33,7 +38,7 @@ int main()
         }
 
         window.clear();
-        window.draw(menu);
+        window.draw(scene);
         window.display();
     }
 

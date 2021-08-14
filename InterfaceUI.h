@@ -1,6 +1,6 @@
 #pragma once
 
-class Menu : public sf::Drawable, public gui::IEventListener
+class Menu : public sf::Drawable, public gui::IEventListener, public IGameEventMaker
 {
 private:
 
@@ -40,6 +40,7 @@ public:
 		loadFiles(path_menu, path_info);
 
 		info_->addListener(this);
+		start_game_->addListener(this);
 
 		start_game_->setCharacterSize(50);
 		info_->setCharacterSize(50);
@@ -68,6 +69,10 @@ public:
 		if (element == info_ && event == gui::EventType::Click)
 		{
 			type_ = TypeMenu::Info;
+		}
+		if (element == start_game_ && event == gui::EventType::Click)
+		{
+			notifyListeners(GameEventType::inGame);
 		}
 	}
 };
