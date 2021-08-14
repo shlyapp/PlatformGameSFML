@@ -5,12 +5,14 @@ class Scene : public sf::Drawable, public IGameEventListener
 private:
 
 	Menu* menu_;
+	Map* map_;
 	GameEventType type_;
 
 public:
 
 	Scene(sf::RenderWindow* window) :
 		menu_(new Menu("data/images/menu.png", "data/images/info.png", window)),
+		map_(new Map(sf::Vector2f{ 26, 15 }, "data/images/textures.png", "data/maps/firstMap.txt")),
 		type_(GameEventType::inMenu)
 	{
 		menu_->addListener(this);
@@ -20,16 +22,13 @@ public:
 	{
 		switch (type_)
 		{
-		case inMenu:
+		case GameEventType::inMenu:
 			target.draw(*menu_);
 			break;
-		case inGame:
+		case GameEventType::inGame:
+			target.draw(*map_);
 			break;
-		case PlayerDied:
-			break;
-		case SetNewLevel:
-			break;
-		case GameOver:
+		case GameEventType::GameOver:
 			break;
 		default:
 			break;

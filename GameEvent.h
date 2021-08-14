@@ -1,6 +1,6 @@
 #pragma once
 
-enum GameEventType
+enum class GameEventType
 {
 	inMenu,
 	inGame,

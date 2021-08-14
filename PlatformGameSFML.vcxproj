@@ -159,6 +159,7 @@
     <ClInclude Include="GameEvent.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="InterfaceUI.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

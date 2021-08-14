@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <list>
 #include <string>
+#include <fstream>
 
 #include <SFML/Graphics.hpp>
 
@@ -11,6 +12,7 @@
 #include "Entity.h"
 #include "GUI.h"
 #include "GameEvent.h"
+#include "Level.h"
 
 #include "InterfaceUI.h"
 
