@@ -15,21 +15,20 @@ class TestEventsWork : public gui::IEventListener
 {
 public:
 
-    void updateByGUIEvent(gui::Event event) override
+    void updateByGUIEvent(gui::EventType event) override
     {
-        switch (event.type)
+        switch (event)
         {
-        case gui::Event::Click:
+        case gui::EventType::Click:
             std::cout << "click\n";
             break;
-        case gui::Event::MouseEnter:
+        case gui::EventType::MouseEnter:
             std::cout << "enter!\n";
             break;
-        case gui::Event::MouseLeave:
+        case gui::EventType::MouseLeave:
             std::cout << "leave!\n";
         }
     }
-
 };
 
 int main()
@@ -62,5 +61,3 @@ int main()
 
     return 0;
 }
-
-

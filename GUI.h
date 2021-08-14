@@ -4,23 +4,16 @@ namespace gui
 {
 
 	//////////////////////////////////////////////////////////////
-	/// Класс GUIEvent отвечает за события с GUI.
+	/// EventType хранить в себе типы событий.
 	//////////////////////////////////////////////////////////////
 
-	class Event
+	enum class EventType
 	{
-	public:
-
-		enum EventType
-		{
-			Click,
-			MouseEnter,
-			MouseLeave
-		};
-
-		mutable EventType type;
-
+		Click,
+		MouseEnter,
+		MouseLeave
 	};
+
 
 	//////////////////////////////////////////////////////////////
 	/// IGUIListener - интерфейс слушателя события.
@@ -33,7 +26,7 @@ namespace gui
 	{
 	public:
 
-		virtual void updateByGUIEvent(Event type) = 0;
+		virtual void updateByGUIEvent(EventType type) = 0;
 
 	};
 
@@ -50,12 +43,13 @@ namespace gui
 
 		sf::RenderWindow* window_;
 
-		Event event_;
+		mutable EventType event_;
 
 		Element(sf::Vector2f position, sf::Vector2f size, sf::RenderWindow* window) : Entity(position, size),
-			window_(window)
+			window_(window),
+			event_(EventType::MouseLeave)
 		{
-			event_.type = Event::MouseLeave;
+
 		}
 
 		void notifyListeners() const
@@ -68,27 +62,27 @@ namespace gui
 
 		virtual void click() const
 		{
-			if (event_.type != Event::Click)
+			if (event_ != EventType::Click)
 			{
-				event_.type = Event::Click;
+				event_ = EventType::Click;
 				notifyListeners();
 			}
 		}
 
 		virtual void enter() const
 		{
-			if (event_.type != Event::MouseEnter)
+			if (event_!= EventType::MouseEnter)
 			{
-				event_.type = Event::MouseEnter;
+				event_ = EventType::MouseEnter;
 				notifyListeners();
 			}
 		}
 
 		virtual void leave() const
 		{
-			if (event_.type != Event::MouseLeave)
+			if (event_!= EventType::MouseLeave)
 			{
-				event_.type = Event::MouseLeave;
+				event_ = EventType::MouseLeave;
 				notifyListeners();
 			}
 		}
