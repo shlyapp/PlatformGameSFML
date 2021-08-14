@@ -62,9 +62,9 @@ public:
 		return size_;
 	}
 
-	/*sf::Vector2<sf::Vector2<float>> getRect2f() const
+	sf::Vector2<sf::Vector2<float>> getRect2f() const
 	{
 		return { position_, position_ + size_ };
-	}*/
+	}
 
 };

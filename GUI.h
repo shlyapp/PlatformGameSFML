@@ -2,6 +2,8 @@
 
 namespace gui
 {
+	// Обьявляем, чтобы использовать в IEventListener
+	class Element;
 
 	//////////////////////////////////////////////////////////////
 	/// EventType хранить в себе типы событий.
@@ -27,7 +29,7 @@ namespace gui
 	public:
 		
 		// Наблюдатель обязан реализовать этот метод.
-		virtual void updateByGUIEvent(EventType type) = 0;
+		virtual void updateByGUIEvent(EventType type, const Element* element) = 0;
 
 	};
 
@@ -66,7 +68,7 @@ namespace gui
 			for (auto listener : listeners_)
 			{
 				// Вызываем у слушателей метод обновления и передаем событие, которое произошло.
-				listener->updateByGUIEvent(event_);
+				listener->updateByGUIEvent(event_, this);
 			}
 		}
 
