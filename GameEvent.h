@@ -1,6 +1,6 @@
 #pragma once
 
-enum class GameEventType
+enum class GameEventState
 {
 	inMenu,
 	inGame,
@@ -9,11 +9,13 @@ enum class GameEventType
 	GameOver
 };
 
+GameEventState GAME_STATE;
+
 class IGameEventListener
 {
 public:
 
-	virtual void updateByGameEvent(GameEventType event) = 0;
+	virtual void updateByGameEvent(GameEventState event) = 0;
 
 };
 
@@ -21,16 +23,21 @@ class IGameEventMaker
 {
 private:
 
-	static std::list<IGameEventListener*> listeners_;
+	inline static std::list<IGameEventListener*> listeners_;
 
 protected:
 
-	void notifyListeners(GameEventType event)
+	void notifyListeners(GameEventState event)
 	{
-		for (auto listener : listeners_)
+		if (event != GAME_STATE)
 		{
-			listener->updateByGameEvent(event);
-		}
+			GAME_STATE = event;
+
+			for (auto listener : listeners_)
+			{
+				listener->updateByGameEvent(event);
+			}
+		}	
 	}
 
 public:
@@ -46,5 +53,3 @@ public:
 	}
 
 };
-
-std::list<IGameEventListener*> IGameEventMaker::listeners_;

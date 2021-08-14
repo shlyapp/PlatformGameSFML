@@ -10,7 +10,7 @@ private:
 		Info
 	};
 
-	mutable TypeMenu type_;
+	mutable TypeMenu type;
 
 	sf::Texture menu_texture_;
 	sf::Sprite menu_sprite_;
@@ -35,7 +35,7 @@ public:
 	Menu(std::string path_menu, std::string path_info, sf::RenderWindow* window) :
 		start_game_(new gui::TextBlock(sf::Vector2f(520, 300), "Новая игра", window)),
 		info_(new gui::TextBlock(sf::Vector2f(520, 360), "О программе", window)),
-		type_(TypeMenu::Start)
+		type(TypeMenu::Start)
 	{
 		loadFiles(path_menu, path_info);
 
@@ -48,7 +48,7 @@ public:
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
-		if (type_ == TypeMenu::Start)
+		if (type == TypeMenu::Start)
 		{
 			target.draw(menu_sprite_);
 			target.draw(*start_game_);
@@ -59,7 +59,7 @@ public:
 			target.draw(info_sprite_);
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			{
-				type_ = TypeMenu::Start;
+				type = TypeMenu::Start;
 			}
 		}
 	}
@@ -68,11 +68,11 @@ public:
 	{
 		if (element == info_ && event == gui::EventType::Click)
 		{
-			type_ = TypeMenu::Info;
+			type = TypeMenu::Info;
 		}
 		if (element == start_game_ && event == gui::EventType::Click)
 		{
-			notifyListeners(GameEventType::inGame);
+			notifyListeners(GameEventState::inGame);
 		}
 	}
 };

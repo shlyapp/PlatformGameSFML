@@ -6,38 +6,36 @@ private:
 
 	Menu* menu_;
 	Map* map_;
-	GameEventType type_;
 
 public:
 
 	Scene(sf::RenderWindow* window) :
 		menu_(new Menu("data/images/menu.png", "data/images/info.png", window)),
-		map_(new Map(sf::Vector2f{ 26, 15 }, "data/images/textures.png", "data/maps/firstMap.txt")),
-		type_(GameEventType::inMenu)
+		map_(new Map(sf::Vector2f{ 26, 15 }, "data/images/textures.png", "data/maps/firstMap.txt"))
 	{
 		menu_->addListener(this);
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 	{
-		switch (type_)
+		switch (GAME_STATE)
 		{
-		case GameEventType::inMenu:
+		case GameEventState::inMenu:
 			target.draw(*menu_);
 			break;
-		case GameEventType::inGame:
+		case GameEventState::inGame:
 			target.draw(*map_);
 			break;
-		case GameEventType::GameOver:
+		case GameEventState::GameOver:
 			break;
 		default:
 			break;
 		}
 	}
 
-	void updateByGameEvent(GameEventType event) override
+	void updateByGameEvent(GameEventState event) override
 	{
-		type_ = event;
+		
 	}
-
 };
+

@@ -1,5 +1,8 @@
 #pragma once
 
+class Enemy;
+class MovingPlatform;
+
 enum class ItemType
 {
 	Gear,
@@ -19,19 +22,19 @@ class Item : public Entity
 {
 private:
 
-	ItemType type_;
+	ItemType type;
 
 public:
 
 	Item(sf::Vector2f position, sf::Vector2f size, ItemType type) : Entity(position, size),
-		type_(type)
+		type(type)
 	{
 
 	}
 
 	ItemType getType() const
 	{
-		return type_;
+		return type;
 	}
 
 };
@@ -40,19 +43,19 @@ class Block : public Entity
 {
 private:
 
-	BlockType type_;
+	BlockType type;
 
 public:
 
 	Block(sf::Vector2f position, sf::Vector2f size, BlockType type) : Entity(position, size),
-		type_(type)
+		type(type)
 	{
 
 	}
 
 	BlockType getType() const
 	{
-		return type_;
+		return type;
 	}
 
 };
@@ -192,6 +195,85 @@ public:
 
 			}
 		}
+	}
+
+};
+
+class Level
+{
+public:
+
+	Map* map;
+
+	sf::Vector2f start_position;
+
+	std::list<Enemy*> enemys;
+	std::list<MovingPlatform*> moving_platforms;
+
+	Level(Map* map_level, sf::Vector2f start_position_player) :
+		map(map_level),
+		start_position(start_position_player)
+	{
+
+	}
+
+	void setEnemys(std::list<Enemy*> enemys)
+	{
+		this->enemys = enemys;
+	}
+
+	void setMovingPlatform(std::list<MovingPlatform*> moving_platforms)
+	{
+		this->moving_platforms = moving_platforms;
+	}
+};
+
+class LevelManager
+{
+private:
+
+	static inline class Notify : IGameEventMaker
+	{
+	public:
+
+		void levelsOver()
+		{
+			notifyListeners(GameEventState::GameOver);
+		}
+
+	};
+
+	inline static int num_level_ = 0;
+
+	inline static std::vector<Level*> levels_;
+
+	inline static Notify nt;
+
+	LevelManager()
+	{
+
+	}
+
+public:
+
+	static inline Level* level = levels_[num_level_];
+
+	static void addLevel(Level* level)
+	{
+		levels_.push_back(level);
+	}
+
+	static void setNewLevel()
+	{
+		num_level_++;
+
+		if (num_level_ <= levels_.size() - 1)
+		{
+			level = levels_[num_level_];
+			return;
+		}
+		
+		nt.levelsOver();
 	}
 
 };
