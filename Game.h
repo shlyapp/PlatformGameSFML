@@ -162,7 +162,7 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 	// Загрузка уровней.
 
 	Level* level1(new Level(new Map(sf::Vector2f{ 26, 15 }, "data/images/textures.png", "data/maps/firstMap.txt"), sf::Vector2f{ 100, 100 }));
-	level1->addMovingPlatform(new MovingPlatform(100, { 0, 500 }, { 50, 150 }, "data/images/platform.png"));
+	level1->addMovingPlatform(new MovingPlatform(200, { 0, 500 }, { 150, 50 }, "data/images/platform.png"));
 
 	LevelManager::addLevel(level1);
 
