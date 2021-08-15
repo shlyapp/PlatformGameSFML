@@ -17,7 +17,7 @@ using Rect2f = sf::Vector2<sf::Vector2f>;
 #include "Level.h"
 #include "Collision.h"
 #include "Abilities.h"
-
+#include "GameObject.h"
 #include "InterfaceUI.h"
 
 #include "Game.h"

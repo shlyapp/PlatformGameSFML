@@ -28,7 +28,7 @@ private:
 
 public:
 
-	static void gameUpdate(Game* game, float time);
+	static void gameUpdate(const Game* game, float time);
 
 };
 
@@ -40,17 +40,21 @@ class Game : public sf::Drawable, public IGameEventListener, public IGameEventMa
 
 private:
 
-	sf::Clock clock_;
+	sf::Clock game_clock_;
+	sf::Clock* clock_;
 	mutable float game_time_;
 
 	sf::View* view_;
 	sf::RenderWindow* window_;
+	MovingPlatform* platform_;
 
 public:
 
 	Game(sf::RenderWindow* window, sf::View* view) :
 		view_(view),
-		window_(window)
+		window_(window),
+		clock_(new sf::Clock()),
+		platform_(new MovingPlatform(sf::Vector2f(0, 100), sf::Vector2f(150, 50), sf::Vector2f(0, 500), 3.0f, "data/images/platform.png"))
 	{
 		
 	}
@@ -59,9 +63,14 @@ public:
 	{
 		notifyListeners(GameEventState::inGame);
 
-		game_time_ = clock_.getElapsedTime().asSeconds();
+		game_time_ = game_clock_.getElapsedTime().asSeconds();
+		float time = clock_->getElapsedTime().asMicroseconds() / 800;
+		clock_->restart();
 
-		target.draw(*LevelManager::level->map);
+		GameUpdater::gameUpdate(this, time);
+
+		//target.draw(*LevelManager::level->map);
+		target.draw(*platform_);
 
 	}
 
@@ -82,14 +91,14 @@ public:
 
 };
 
-inline void GameUpdater::gameUpdate(Game* game, float time)
+inline void GameUpdater::gameUpdate(const Game* game, float time)
 {
-
+	game->platform_->update();
 }
 
 inline void GameLoader::loadGame(Game* game, sf::View* view)
 {
-	game->clock_.restart();
+	game->game_clock_.restart();
 
 	LevelManager::addLevel(
 		new Level
