@@ -5,6 +5,8 @@
 
 #include <SFML/Graphics.hpp>
 
+using Rect2f = sf::Vector2<sf::Vector2f>;
+
 //////////////////////////////////////////////////////////////
 /// Подключение заголовочных файлов с кодом.
 //////////////////////////////////////////////////////////////
@@ -13,6 +15,8 @@
 #include "GUI.h"
 #include "GameEvent.h"
 #include "Level.h"
+#include "Collision.h"
+#include "Abilities.h"
 
 #include "InterfaceUI.h"
 
