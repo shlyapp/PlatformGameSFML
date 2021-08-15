@@ -46,7 +46,7 @@ private:
 
 	sf::View* view_;
 	sf::RenderWindow* window_;
-	MovingPlatform* platform_;
+	Enemy* enemy_;
 
 public:
 
@@ -54,7 +54,7 @@ public:
 		view_(view),
 		window_(window),
 		clock_(new sf::Clock()),
-		platform_(new MovingPlatform(sf::Vector2f(0, 100), sf::Vector2f(150, 50), sf::Vector2f(0, 500), 3.0f, "data/images/platform.png"))
+		enemy_(new Enemy(100, { 0, 500 }, {35, 48}, "data/images/chip.png"))
 	{
 		
 	}
@@ -70,7 +70,7 @@ public:
 		GameUpdater::gameUpdate(this, time);
 
 		//target.draw(*LevelManager::level->map);
-		target.draw(*platform_);
+		target.draw(*enemy_);
 
 	}
 
@@ -93,7 +93,7 @@ public:
 
 inline void GameUpdater::gameUpdate(const Game* game, float time)
 {
-	game->platform_->update();
+	game->enemy_->update(time);
 }
 
 inline void GameLoader::loadGame(Game* game, sf::View* view)

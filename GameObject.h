@@ -75,6 +75,8 @@ class GameEntity
 {
 protected:
 
+	const sf::Vector2f SPRITE_POSITION_INACCUARACY = { 0.0f, 20.0f };
+
 	float health_;
 	float damage_;
 
@@ -110,6 +112,16 @@ public:
 	bool isLive() const
 	{
 		return is_live_;
+	}
+
+	void setDamage(const float damage)
+	{
+		damage_ = damage;
+	}
+
+	void setHealth(const float health)
+	{
+		health_ = health;
 	}
 
 };
@@ -202,4 +214,59 @@ public:
 		target.draw(sprite_);
 	}
 
+};
+
+class Enemy :
+	public IMoveAble,
+	public IAnimationAble,
+	public Entity,
+	public GameEntity
+{
+private:
+
+	sf::Vector2f control_points_;
+
+public:
+
+	Enemy(float y, sf::Vector2f control_points, sf::Vector2f size, std::string path_texture) :
+		IMoveAble(2.0f),
+		IAnimationAble(path_texture, 4, 0.01f, size),
+		Entity(sf::Vector2f(control_points.x, y), size),
+		GameEntity(100, 10),
+
+		control_points_(control_points)
+	{
+		anim_state_ = AnimationState::MoveRight;
+		sprite_.setTextureRect(sf::IntRect(0, 0, size.x, size.y));
+	}
+
+	void update(float time) override
+	{
+		if (anim_state_ == AnimationState::MoveRight)
+		{
+			if (position_.x > control_points_.y)
+			{
+				anim_state_ = AnimationState::MoveLeft;
+			}
+			else
+			{
+				speed_.x = speed_value_;
+			}
+		}
+		else
+		{
+			if (position_.x < control_points_.x)
+			{
+				anim_state_ = AnimationState::MoveRight;
+			}
+			else
+			{
+				speed_.x = -speed_value_;
+			}
+		}
+
+		IMoveAble::updateByMove();
+		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
+		changeFrameAnimation(time);
+	}
 };

@@ -90,6 +90,12 @@ protected:
 		speed_ += acceleration_;
 		position_ += speed_;
 	}
+
+	// Сеттер для скорости.
+	void setSpeed(const float speed)
+	{
+		speed_value_ = speed;
+	}
 };
 
 //////////////////////////////////////////////////////////////
@@ -110,8 +116,7 @@ private:
 
 	// Текстура, спрайт, размер.
 	sf::Texture texture_;
-	sf::Sprite sprite_;
-	sf::Vector2f size_;
+	sf::Vector2f size_sprite_;
 
 	// Направление взгляда.
 	enum ViewDirectionState
@@ -120,17 +125,7 @@ private:
 		Right
 	};
 
-	// Состояние анимации.
-	enum AnimationState
-	{
-		MoveLeft,
-		MoveRight,
-		Stay,
-		Jump
-	};
-
 	ViewDirectionState view_state_;
-	AnimationState anim_state_;
 
 	// Загрузка текстур.
 	void loadFiles(const std::string path_texture)
@@ -141,11 +136,23 @@ private:
 
 protected:
 	
+	// Состояние анимации.
+	enum AnimationState
+	{
+		MoveLeft,
+		MoveRight,
+		Stay,
+		Jump
+	};
+
+	AnimationState anim_state_;
+	sf::Sprite sprite_;
+
 	// Конструктор для инициализации.
 	IAnimationAble(std::string path_texture, int frames, float speed_anim, sf::Vector2f size) : 
 		speed_anim_(speed_anim),
 		frames_(frames),
-		size_(size),
+		size_sprite_(size),
 		current_frame_(0),
 		anim_state_(AnimationState::Stay),
 		view_state_(ViewDirectionState::Right)
@@ -165,22 +172,22 @@ protected:
 		// В зависимости от состояния, выводим нужную анимацию.
 		switch (anim_state_)
 		{
-		case AnimationState::MoveLeft:
-			sprite_.setTextureRect(sf::IntRect(size_.x * int(current_frame_), 0, size_.x, size_.y));
+		case AnimationState::MoveRight:
+			sprite_.setTextureRect(sf::IntRect(size_sprite_.x * int(current_frame_), 0, size_sprite_.x, size_sprite_.y));
 			view_state_ = ViewDirectionState::Left;
 			break;
-		case AnimationState::MoveRight:
-			sprite_.setTextureRect(sf::IntRect(size_.x * int(current_frame_), size_.y + 1, size_.x, size_.y));
+		case AnimationState::MoveLeft:
+			sprite_.setTextureRect(sf::IntRect(size_sprite_.x * int(current_frame_), size_sprite_.y + 1, size_sprite_.x, size_sprite_.y));
 			view_state_ = ViewDirectionState::Right;
 			break;
 		default:
 			if (view_state_ == ViewDirectionState::Right)
 			{
-				sprite_.setTextureRect(sf::IntRect(0, 0, size_.x, size_.y));
+				sprite_.setTextureRect(sf::IntRect(0, 0, size_sprite_.x, size_sprite_.y));
 			}
 			else
 			{
-				sprite_.setTextureRect(sf::IntRect(size_.x, size_.y + 1, size_.x, size_.y));
+				sprite_.setTextureRect(sf::IntRect(size_sprite_.x, size_sprite_.y + 1, size_sprite_.x, size_sprite_.y));
 			}
 			break;
 		}
@@ -194,5 +201,17 @@ protected:
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 	{
 		target.draw(sprite_);
+	}
+
+	// Сеттер количества кадров.
+	void setFrames(const int frames)
+	{
+		frames_ = frames;
+	}
+
+	// Сеттер скорости анимации.
+	void setSpeedAnimation(const float speed)
+	{
+		speed_anim_ = speed;
 	}
 };
