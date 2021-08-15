@@ -94,6 +94,9 @@ public:
 	}
 };
 
+//////////////////////////////////////////////////////////////
+/// Этот класс отвечает за вывод информации о персонаже.
+//////////////////////////////////////////////////////////////
 class PlayerInfoBar : 
 	public sf::Drawable,
 	public gui::IEventListener,
@@ -101,6 +104,7 @@ class PlayerInfoBar :
 {
 private:
 
+	// Создаем блоки с информацией.
 	gui::TextBlock* health_block_;
 	gui::TextBlock* time_block_;
 	gui::TextBlock* gears_block_;
@@ -114,10 +118,12 @@ public:
 		gears_block_(new gui::TextBlock(sf::Vector2f(0.0f, 150.0f), "Шестерни: ", window)),
 		change_player_(new gui::TextBlock(sf::Vector2f(0.0f, 200.0f), "Сменить персонажа", window))
 	{
+		// Выключаем интерактивность у всех, кроме "Смена персонажа".
 		health_block_->disableInteractivity();
 		time_block_->disableInteractivity();
 		gears_block_->disableInteractivity();
 
+		// Добавляем слушателя к "Сменить персонажа", чтобы знать, когда она нажмется и оповестить об этом игру.
 		change_player_->addListener(this);
 	}
 
@@ -131,24 +137,9 @@ public:
 
 	void updateByGUIEvent(gui::EventType event, const gui::Element* element) override
 	{
-
-		switch (event)
-		{
-		case gui::EventType::Click:
-			std::cout << "click!\n";
-			break;
-		case gui::EventType::MouseEnter:
-			std::cout << "enter!\n";
-			break;
-		case gui::EventType::MouseLeave:
-			std::cout << "leave!\n";
-			break;
-		default:
-			break;
-		}
-
 		if (event == gui::EventType::Click)
 		{
+			// Оповещаем игру, чтобы она сменила персонажа.
 			notifyListeners(GameEventState::PlayerChanged);
 		}	
 	}

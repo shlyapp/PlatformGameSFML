@@ -81,7 +81,6 @@ namespace gui
 			// Если еще не нажата.
 			if (event_ != EventType::Click && clock_.getElapsedTime().asMilliseconds() > time_ + 300)
 			{
-				std::cout << "CLICK!\n";
 				// Нажимаем.
 				event_ = EventType::Click;
 				// Оповещаем о изменениях.

@@ -114,7 +114,7 @@ public:
 			break;
 
 		case GameEventState::SetNewLevel:
-			main_player_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
+			setNewLevelUpdate();
 			break;
 		}
 
@@ -130,6 +130,13 @@ public:
 		{
 			main_player_ = player1_;
 		}
+	}
+
+	void setNewLevelUpdate()
+	{
+		player1_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
+		player2_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
+		main_player_ = player1_;
 	}
 
 };

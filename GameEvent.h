@@ -53,7 +53,7 @@ protected:
 			GAME_STATE = event;
 			
 			// ƒл€ удобного дебага, выводим состо€ние в консоль.
-			/*switch (GAME_STATE)
+			switch (GAME_STATE)
 			{
 			case GameEventState::StartGame:
 				std::cout << "start game!\n";
@@ -78,7 +78,7 @@ protected:
 				break;
 			default:
 				break;
-			}*/
+			}
 
 
 			for (auto listener : listeners_)
