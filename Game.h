@@ -47,7 +47,11 @@ private:
 	sf::View* view_;
 	sf::RenderWindow* window_;
 
-	Player* player_;
+	Player* main_player_;
+	Player* player1_;
+	Player* player2_;
+
+	PlayerInfoBar* info_;
 
 public:
 
@@ -88,7 +92,8 @@ public:
 			target.draw(*moving_platform);
 		}
 
-		target.draw(*player_);
+		target.draw(*info_);
+		target.draw(*main_player_);
 		
 	}
 
@@ -104,9 +109,26 @@ public:
 		case GameEventState::PlayerDied:
 			break;
 
-		case GameEventState::SetNewLevel:
-			player_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
+		case GameEventState::PlayerChanged:
+			changePlayer();
 			break;
+
+		case GameEventState::SetNewLevel:
+			main_player_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
+			break;
+		}
+
+	}
+
+	void changePlayer()
+	{
+		if (main_player_ == player1_)
+		{
+			main_player_ = player2_;
+		}
+		else if (main_player_ == player2_)
+		{
+			main_player_ = player1_;
 		}
 	}
 
@@ -118,17 +140,17 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 
 	for (auto block : LevelManager::level->map->blocks)
 	{
-		if (game->player_->getRect2f() & block->getRect2f())
+		if (game->main_player_->getRect2f() & block->getRect2f())
 		{
-			game->player_->handlingCollision(*block);
+			game->main_player_->handlingCollision(*block);
 		}
 	}
 
 	for (auto item : LevelManager::level->map->items)
 	{
-		if (game->player_->getRect2f() & item->getRect2f())
+		if (game->main_player_->getRect2f() & item->getRect2f())
 		{
-			game->player_->handlingCollision(*item);
+			game->main_player_->handlingCollision(*item);
 		}
 	}
 
@@ -136,9 +158,9 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	{
 		enemy->update(time);
 
-		if (game->player_->getRect2f() & enemy->getRect2f())
+		if (game->main_player_->getRect2f() & enemy->getRect2f())
 		{
-			game->player_->handlingCollision(*enemy);
+			game->main_player_->handlingCollision(*enemy);
 		}
 	}
 
@@ -146,13 +168,14 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	{
 		moving_platform->update();
 
-		if (game->player_->getRect2f() & moving_platform->getRect2f())
+		if (game->main_player_->getRect2f() & moving_platform->getRect2f())
 		{
-			game->player_->handlingCollision(*moving_platform);
+			game->main_player_->handlingCollision(*moving_platform);
 		}
 	}
-
-	game->player_->update(time);
+	
+	game->info_->update(game->main_player_->getHealth(), game->game_time_, game->main_player_->getGearsNum(), *game->view_);
+	game->main_player_->update(time);
 }
 
 inline void GameLoader::loadGame(Game* game, sf::View* view)
@@ -165,7 +188,7 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 	level1->addMovingPlatform(new MovingPlatform(200, { 0, 500 }, { 150, 50 }, "data/images/platform.png"));
 
 	LevelManager::addLevel(level1);
-
+	
 	Level* level2(new Level(new Map(sf::Vector2f{ 15, 10 }, "data/images/textures.png", "data/maps/secondMap.txt"), sf::Vector2f{ 100, 100 }));
 	LevelManager::addLevel(level2);
 
@@ -173,5 +196,10 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 
 	// Загружаем персонажа.
 
-	game->player_ = new Player(LevelManager::level->start_position, { 49, 112 }, view, "data/images/player.png");
+	game->player1_ = new Player(LevelManager::level->start_position, { 49, 112 }, view, "data/images/player.png");
+	game->player2_ = new Player(LevelManager::level->start_position, { 49, 112 }, view, "data/images/player.png");
+
+	game->main_player_ = game->player1_;
+
+	game->info_ = new PlayerInfoBar(game->window_);
 }

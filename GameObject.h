@@ -125,6 +125,11 @@ public:
 		health_ = health;
 	}
 
+	float getHealth() const
+	{
+		return health_;
+	}
+
 };
 
 //////////////////////////////////////////////////////////////
@@ -441,5 +446,10 @@ public:
 			speed_.y = 0;
 			anim_state_ = AnimationState::Stay;
 		}
+	}
+
+	int getGearsNum() const
+	{
+		return gears_;
 	}
 };

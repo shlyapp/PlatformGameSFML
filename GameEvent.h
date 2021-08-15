@@ -11,6 +11,7 @@ enum class GameEventState
 	StartGame,
 	inGame,
 	PlayerDied,
+	PlayerChanged,
 	SetNewLevel,
 	GameOver
 };
@@ -52,10 +53,13 @@ protected:
 			GAME_STATE = event;
 			
 			// ƒл€ удобного дебага, выводим состо€ние в консоль.
-			switch (GAME_STATE)
+			/*switch (GAME_STATE)
 			{
 			case GameEventState::StartGame:
 				std::cout << "start game!\n";
+				break;
+			case GameEventState::PlayerChanged:
+				std::cout << "player changed!\n";
 				break;
 			case GameEventState::inMenu:
 				std::cout << "in menu!\n";
@@ -74,7 +78,7 @@ protected:
 				break;
 			default:
 				break;
-			}
+			}*/
 
 
 			for (auto listener : listeners_)

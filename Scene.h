@@ -22,7 +22,7 @@ private:
 	Menu* menu_;
 	Game* game_;
 
-	mutable sf::View view_;
+	sf::View view_;
 	
 public:
 
@@ -49,7 +49,6 @@ public:
 			target.draw(*menu_);
 			break;
 		case SceneState::InGame:
-			view_.reset(sf::FloatRect(0, 0, 550, 400));
 			target.draw(*game_);
 			target.setView(view_);
 			break;
@@ -66,6 +65,7 @@ public:
 		// Если игра началась, то изменяем состояния на "В игре"
 		if (event == GameEventState::inGame)
 		{
+			view_.reset(sf::FloatRect(0, 0, 550, 400));
 			state_ = SceneState::InGame;
 		}
 		// Если игра закончилась, то изменяем на "Игра окончена."

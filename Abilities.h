@@ -176,11 +176,11 @@ protected:
 		{
 		case AnimationState::MoveRight:
 			sprite_.setTextureRect(sf::IntRect(size_sprite_.x * int(current_frame_), 0, size_sprite_.x, size_sprite_.y));
-			view_state_ = ViewDirectionState::Left;
+			view_state_ = ViewDirectionState::Right;
 			break;
 		case AnimationState::MoveLeft:
 			sprite_.setTextureRect(sf::IntRect(size_sprite_.x * int(current_frame_), size_sprite_.y + 1, size_sprite_.x, size_sprite_.y));
-			view_state_ = ViewDirectionState::Right;
+			view_state_ = ViewDirectionState::Left;
 			break;
 		default:
 			if (view_state_ == ViewDirectionState::Right)

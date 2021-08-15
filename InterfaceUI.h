@@ -93,3 +93,79 @@ public:
 		}
 	}
 };
+
+class PlayerInfoBar : 
+	public sf::Drawable,
+	public gui::IEventListener,
+	public IGameEventMaker
+{
+private:
+
+	gui::TextBlock* health_block_;
+	gui::TextBlock* time_block_;
+	gui::TextBlock* gears_block_;
+	gui::TextBlock* change_player_;
+
+public:
+
+	PlayerInfoBar(sf::RenderWindow* window) :
+		health_block_(new gui::TextBlock(sf::Vector2f(0.0f, 50.0f), "Здоровье: ", window)),
+		time_block_(new gui::TextBlock(sf::Vector2f(0.0f, 100.0f), "Время: ", window)),
+		gears_block_(new gui::TextBlock(sf::Vector2f(0.0f, 150.0f), "Шестерни: ", window)),
+		change_player_(new gui::TextBlock(sf::Vector2f(0.0f, 200.0f), "Сменить персонажа", window))
+	{
+		health_block_->disableInteractivity();
+		time_block_->disableInteractivity();
+		gears_block_->disableInteractivity();
+
+		change_player_->addListener(this);
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
+	{
+		target.draw(*health_block_);
+		target.draw(*time_block_);
+		target.draw(*gears_block_);
+		target.draw(*change_player_);
+	}
+
+	void updateByGUIEvent(gui::EventType event, const gui::Element* element) override
+	{
+
+		switch (event)
+		{
+		case gui::EventType::Click:
+			std::cout << "click!\n";
+			break;
+		case gui::EventType::MouseEnter:
+			std::cout << "enter!\n";
+			break;
+		case gui::EventType::MouseLeave:
+			std::cout << "leave!\n";
+			break;
+		default:
+			break;
+		}
+
+		if (event == gui::EventType::Click)
+		{
+			notifyListeners(GameEventState::PlayerChanged);
+		}	
+	}
+
+	void update(int health, int time, int num_gears, sf::View& view)
+	{
+
+		health_block_->setText("Здоровье: " + std::to_string(health));
+		health_block_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 200.0f });
+
+		time_block_->setText("Время: " + std::to_string(time));
+		time_block_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 170.0f });
+
+		gears_block_->setText("Шестерни: " + std::to_string(num_gears));
+		gears_block_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 140.0f });
+
+		change_player_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 110.0f });
+	}
+
+};

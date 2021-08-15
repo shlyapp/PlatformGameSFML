@@ -40,6 +40,12 @@ namespace gui
 	{	
 	protected:
 
+		// Задержка для нажатия.
+		inline static sf::Clock clock_;
+
+		// Время нажатия.
+		mutable unsigned long long int time_;
+
 		// Для хранения слушателей событий.
 		std::list<IEventListener*> listeners_;
 
@@ -52,7 +58,8 @@ namespace gui
 		// Конструктор для инициализации.
 		Element(sf::Vector2f position, sf::Vector2f size, sf::RenderWindow* window) : Entity(position, size),
 			window_(window),
-			event_(EventType::MouseLeave)
+			event_(EventType::MouseLeave),
+			time_(0)
 		{
 
 		}
@@ -72,12 +79,16 @@ namespace gui
 		virtual void click() const
 		{
 			// Если еще не нажата.
-			if (event_ != EventType::Click)
+			if (event_ != EventType::Click && clock_.getElapsedTime().asMilliseconds() > time_ + 300)
 			{
+				std::cout << "CLICK!\n";
 				// Нажимаем.
 				event_ = EventType::Click;
 				// Оповещаем о изменениях.
 				notifyListeners();
+
+				// Обновляем время нажатия.
+				time_ = clock_.getElapsedTime().asMilliseconds();
 			}
 		}
 
@@ -200,14 +211,14 @@ namespace gui
 		{
 			loadText();
 			// Устанавливаем корректный размер в зависимости от размера шрифта и количества символов.
-			setSize(sf::Vector2f{ float (str_.size() * text_.getCharacterSize()), float (text_.getCharacterSize()) });
+			setSize(sf::Vector2f{ text_.getGlobalBounds().width, text_.getGlobalBounds().height});
 		}
 
 		// Сеттер для изменения размера шрифта.
 		void setCharacterSize(const float size)
 		{
 			text_.setCharacterSize(size);
-			setSize(sf::Vector2f{ float(str_.size() * text_.getCharacterSize()), float(text_.getCharacterSize()) });
+			setSize(sf::Vector2f{ text_.getGlobalBounds().width, text_.getGlobalBounds().height });
 		}
 
 		// Сеттер для изменения цветов событий, если стандартные не устривают, можно поставить любые.
@@ -229,9 +240,17 @@ namespace gui
 			setSize(sf::Vector2f{ float(str_.size() * text_.getCharacterSize()), float(text_.getCharacterSize()) });
 		}
 
+		// Переопределяем для корректной установки позиции.
+		void setPosition(const sf::Vector2f position) override
+		{
+			position_ = position;
+			text_.setPosition(position);
+		}
+
 		// Отрисовка текста.
 		void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 		{
+
 			// Если текст интерактивный, то обновляем его родительским draw().
 			if (is_interactive_)
 			{
