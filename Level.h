@@ -148,6 +148,9 @@ private:
 				case 'a':
 					items.emplace_back(new Item(position, size, ItemType::Gear));
 					break;
+				default:
+					blocks.emplace_back(new Block(position, size, BlockType::Simple));
+					break;
 				}
 			}
 		}
@@ -261,14 +264,14 @@ public:
 	}
 
 	// Враги и платформы могут быть, а могут и не быть, поэтиому добавляем сеттер для них.
-	void setEnemys(std::list<Enemy*> enemys)
+	void addEnemy(Enemy* enemy)
 	{
-		this->enemys = enemys;
+		enemys.push_back(enemy);
 	}
 
-	void setMovingPlatform(std::list<MovingPlatform*> moving_platforms)
+	void addMovingPlatform(MovingPlatform* moving_platform)
 	{
-		this->moving_platforms = moving_platforms;
+		moving_platforms.push_back(moving_platform);
 	}
 };
 

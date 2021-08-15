@@ -164,8 +164,8 @@ private:
 public:
 
 	// Конструктор для инициализации.
-	MovingPlatform(float y, sf::Vector2f control_points, sf::Vector2f size, float speed, std::string path_texture) :
-		IMoveAble(speed),
+	MovingPlatform(float y, sf::Vector2f control_points, sf::Vector2f size, std::string path_texture) :
+		IMoveAble(3.0f),
 		Entity(sf::Vector2f{ control_points.x, y }, size),
 
 		control_points_(control_points),
@@ -278,5 +278,157 @@ public:
 		IMoveAble::updateByMove();
 		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
 		changeFrameAnimation(time);
+	}
+};
+
+class Player:
+	public ICollisionWithBlockAble, public ICollisionWithEnemyAble, public ICollisionWithItemAble, public ICollisionWithPlatformAble,
+	public IMoveAble,
+	public IAnimationAble,
+	public Entity,
+	public GameEntity
+{
+private:
+
+	bool on_ground_;
+	int gears_;
+
+	Camera camera_;
+
+	void handlingCollisionWithBorder()
+	{
+		if (LevelManager::level->map->size.x * 50 < this->position_.x)
+		{
+			setPosition(sf::Vector2f(LevelManager::level->map->size.x * 50, getPosition().y));
+		}
+
+		if (this->position_.x < 0)
+		{
+			setPosition(sf::Vector2f(0, getPosition().y));
+		}
+
+		if (position_.y > LevelManager::level->map->size.y * 50)
+		{
+			this->dealDamage(health_);
+		}
+	}
+
+public:
+
+	Player(sf::Vector2f position, sf::Vector2f size, sf::View* view, std::string path_texture) :
+		IMoveAble(5.0f),
+		IAnimationAble(path_texture, 9, 0.01f, size),
+		Entity(position, size),
+		GameEntity(100.0f, 50.0f),
+
+		camera_(view, {10, 20}),
+		gears_(0)
+	{
+
+	}
+
+	void update(const float time) override
+	{
+		acceleration_.y += 0.02f;
+		speed_.x = 0;
+
+		if (on_ground_ && anim_state_ == AnimationState::Stay)
+		{
+			acceleration_ = { 0, 0 };
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && on_ground_)
+		{
+			anim_state_ = AnimationState::Jump;
+			speed_.y = -28 / (4 / 2) / 2 + 2 / 4;
+		}
+		else
+		{
+			if (on_ground_) anim_state_ = AnimationState::Jump;
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			anim_state_ = AnimationState::MoveRight;
+			speed_.x = speed_value_;
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			anim_state_ = AnimationState::MoveLeft;
+			speed_.x = -speed_value_;
+		}
+
+		handlingCollisionWithBorder();
+
+		IMoveAble::updateByMove();
+
+		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
+
+		changeFrameAnimation(time);
+
+		camera_.updateByPosition(position_);
+	}
+
+	void handlingCollision(Block& block) override
+	{
+		switch (block.getType())
+		{
+		case BlockType::Ground:
+			if (getRect2f().y.y < block.getRect2f().y.y)
+			{
+				position_.y -= speed_.y;
+				on_ground_ = true;
+				speed_.y = 0;
+				anim_state_ = AnimationState::Stay;
+			}
+			break;
+		case BlockType::Border:
+			if (speed_.x > 0)
+			{
+				position_.x = block.getRect2f().x.x - size_.x + 10;
+			}
+			else if (speed_.x < 0)
+			{
+				position_.x = block.getRect2f().y.x - 10;
+			}
+			break;
+		case BlockType::Spikes:
+			dealDamage(5);
+			break;
+		default:
+			on_ground_ = false;
+			break;
+		}
+	}
+
+	void handlingCollision(Item& item) override
+	{
+		if (item.getType() == ItemType::Star)
+		{
+			LevelManager::setNewLevel();
+		}
+	}
+
+	void handlingCollision(Enemy& enemy) override
+	{
+		if (enemy.getRect2f().y.y > this->getRect2f().y.y)
+		{
+			enemy.dealDamage(damage_);
+		}
+		else
+		{
+			this->dealDamage(enemy.getDamageValue());
+		}
+	}
+
+	void handlingCollision(MovingPlatform& platform) override
+	{
+		if (getRect2f().y.y <= platform.getRect2f().y.y)
+		{
+			position_.y -= speed_.y;
+			on_ground_ = true;
+			speed_.y = 0;
+			anim_state_ = AnimationState::Stay;
+		}
 	}
 };
