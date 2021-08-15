@@ -91,6 +91,8 @@ protected:
 		position_ += speed_;
 	}
 
+public:
+
 	// Сеттер для скорости.
 	void setSpeed(const float speed)
 	{
@@ -202,6 +204,8 @@ protected:
 	{
 		target.draw(sprite_);
 	}
+
+public:
 
 	// Сеттер количества кадров.
 	void setFrames(const int frames)

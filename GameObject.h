@@ -75,6 +75,7 @@ class GameEntity
 {
 protected:
 
+	// Значением смещения (чтобы ноги персонажа были на земле).
 	const sf::Vector2f SPRITE_POSITION_INACCUARACY = { 0.0f, 20.0f };
 
 	float health_;
@@ -216,6 +217,10 @@ public:
 
 };
 
+//////////////////////////////////////////////////////////////
+/// Enemy описывает противника, который двигается по двум
+/// контрольным точкам и наносит урон противнику при столкновении.
+//////////////////////////////////////////////////////////////
 class Enemy :
 	public IMoveAble,
 	public IAnimationAble,
@@ -224,10 +229,14 @@ class Enemy :
 {
 private:
 
+	// Контрольные точки.
 	sf::Vector2f control_points_;
 
 public:
 
+	// Конструктор, которые выставляет стандартные параметры, если есть необходимость что-то изменить, 
+	// то можно воспользоваться сеттером. Например, не устраивает скорость движения 2.0f и есть враг,
+	// у которого скорость должна быть больше, то при помощи setSpeed() уставливаем другую скорость.
 	Enemy(float y, sf::Vector2f control_points, sf::Vector2f size, std::string path_texture) :
 		IMoveAble(2.0f),
 		IAnimationAble(path_texture, 4, 0.01f, size),
@@ -240,6 +249,7 @@ public:
 		sprite_.setTextureRect(sf::IntRect(0, 0, size.x, size.y));
 	}
 
+	// Метод обновлени, похож на обновление у MovingPlatform, но еще добавляется анимация.
 	void update(float time) override
 	{
 		if (anim_state_ == AnimationState::MoveRight)
