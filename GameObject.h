@@ -453,3 +453,184 @@ public:
 		return gears_;
 	}
 };
+
+class Bullet :
+	public sf::Drawable,
+	public Entity,
+	public IMoveAble
+{
+private:
+
+	inline static sf::Texture texture_;
+	inline static sf::Sprite sprite_;
+
+	void loadFiles()
+	{
+		texture_.loadFromFile("data/images/bullet.png");
+		sprite_.setTexture(texture_);
+	}
+
+public:
+
+	enum Direction
+	{
+		Left,
+		Right
+	};
+
+	mutable Direction dir_;
+
+	Bullet(sf::Vector2f position, Direction dir) : 
+		IMoveAble(6.0f),
+		Entity(position, sf::Vector2f{30.0f, 10.0f}),
+
+		dir_(dir)
+	{
+		loadFiles();
+
+		if (dir == Direction::Left)
+		{
+			if (sprite_.getScale() != sf::Vector2f{ -1, 1 })
+			{
+				sprite_.scale(-1, 1);
+			}
+		}
+		else
+		{
+			sprite_.scale(-1, 1);
+		}
+		
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
+	{
+		target.draw(sprite_);
+	}
+
+	void update()
+	{
+		if (dir_ == Direction::Right)
+		{
+			speed_.x = speed_value_;
+		}
+		else if (dir_ == Direction::Left)
+		{
+			speed_.x = -speed_value_;
+		}
+
+		IMoveAble::updateByMove();
+		sprite_.setPosition(position_);
+	}
+
+};
+
+class Boss :
+	public IAnimationAble,
+	public IShootAble,
+	public IMoveAble,
+	public Entity,
+	public GameEntity
+{
+private:
+
+	sf::Vector2f control_points_;
+
+	sf::Clock clock_;
+	float time_shoot_;
+
+public:
+
+	Boss(float y, sf::Vector2f control_points, sf::Vector2f size, std::string path_texture) :
+		Entity(sf::Vector2f(control_points.x, y), size),
+		GameEntity(1000, 30),
+		IAnimationAble(path_texture, 4, 0.01f, size),
+		IMoveAble(2.0f),
+	
+		control_points_(control_points),
+		time_shoot_(0)
+	{
+		
+	}
+
+	void takeShoot() override
+	{
+		if (anim_state_ == AnimationState::MoveLeft)
+		{
+			bullets_.push_back(new Bullet(position_ + sf::Vector2f(0, size_.y / 2), Bullet::Direction::Left));
+		}
+		else if (anim_state_ == AnimationState::MoveRight)
+		{
+			bullets_.push_back(new Bullet(position_ + sf::Vector2f(0, size_.y / 2), Bullet::Direction::Right));
+		}
+	}
+
+	void update(const float time) override
+	{
+		if (clock_.getElapsedTime().asMilliseconds() > time_shoot_ + 2000)
+		{
+			switch (anim_state_)
+			{
+			case IAnimationAble::MoveLeft:
+				std::cout << "left!\n";
+				break;
+			case IAnimationAble::MoveRight:
+				std::cout << "right\n";
+				break;
+			case IAnimationAble::Stay:
+				break;
+			case IAnimationAble::Jump:
+				break;
+			default:
+				break;
+			}
+
+			std::cout << "shoot!\n";
+			takeShoot();
+			
+			time_shoot_ = clock_.getElapsedTime().asMilliseconds();
+		}
+
+		if (anim_state_ == AnimationState::MoveRight)
+		{
+			if (position_.x > control_points_.y)
+			{
+				anim_state_ = AnimationState::MoveLeft;
+			}
+			else
+			{
+				speed_.x = speed_value_;
+			}
+		}
+		else
+		{
+			if (position_.x < control_points_.x)
+			{
+				anim_state_ = AnimationState::MoveRight;
+			}
+			else
+			{
+				speed_.x = -speed_value_;
+			}
+		}
+
+		IMoveAble::updateByMove();
+		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
+		changeFrameAnimation(time);
+
+		for (auto bullet : bullets_)
+		{
+			bullet->update();
+		}
+
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
+	{
+		IAnimationAble::draw(target, animation_state);
+
+		for (auto bullet : bullets_)
+		{
+			bullet->draw(target, animation_state);
+		}
+	}
+};

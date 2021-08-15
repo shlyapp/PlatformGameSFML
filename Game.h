@@ -93,6 +93,12 @@ public:
 		}
 
 		target.draw(*info_);
+
+		if (LevelManager::level->boss != nullptr)
+		{
+			target.draw(*LevelManager::level->boss);
+		}
+
 		target.draw(*main_player_);
 		
 	}
@@ -181,6 +187,11 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 		}
 	}
 	
+	if (LevelManager::level->boss != nullptr)
+	{
+		LevelManager::level->boss->update(time);
+	}
+
 	game->info_->update(game->main_player_->getHealth(), game->game_time_, game->main_player_->getGearsNum(), *game->view_);
 	game->main_player_->update(time);
 }
@@ -197,6 +208,7 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 	LevelManager::addLevel(level1);
 	
 	Level* level2(new Level(new Map(sf::Vector2f{ 15, 10 }, "data/images/textures.png", "data/maps/secondMap.txt"), sf::Vector2f{ 100, 100 }));
+	level2->addBoss(new Boss(300, sf::Vector2f{ 100, 600 }, sf::Vector2f{ 123, 144 }, "data/images/boss.png"));
 	LevelManager::addLevel(level2);
 
 	LevelManager::setNewLevel();

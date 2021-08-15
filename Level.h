@@ -2,6 +2,7 @@
 
 class Enemy;
 class MovingPlatform;
+class Boss;
 
 // Храним типы предметов в игре.
 enum class ItemType
@@ -254,6 +255,7 @@ public:
 	// Враги и платформы на карте.
 	std::list<Enemy*> enemys;
 	std::list<MovingPlatform*> moving_platforms;
+	Boss* boss;
 
 	// Конструктор для создания.
 	Level(Map* map_level, sf::Vector2f start_position_player) :
@@ -272,6 +274,11 @@ public:
 	void addMovingPlatform(MovingPlatform* moving_platform)
 	{
 		moving_platforms.push_back(moving_platform);
+	}
+
+	void addBoss(Boss* boss)
+	{
+		this->boss = boss;
 	}
 };
 

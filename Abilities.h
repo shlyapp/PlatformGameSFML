@@ -61,6 +61,20 @@ protected:
 
 };
 
+class Player;
+
+class ICollisionWithPlayerAble
+{
+protected:
+
+	ICollisionWithPlayerAble()
+	{
+
+	}
+
+	virtual void handlingCollision(Player& player) = 0;
+};
+
 //////////////////////////////////////////////////////////////
 /// Интерфейс IMoveAble отвечает за передвижение. Если что-то
 /// должно двигаться в игре, то оно реализует данный интерфейс.
@@ -218,4 +232,16 @@ public:
 	{
 		speed_anim_ = speed;
 	}
+};
+
+class Bullet;
+
+class IShootAble
+{
+protected:
+
+	std::list <Bullet*> bullets_;
+
+	virtual void takeShoot() = 0;
+
 };
