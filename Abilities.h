@@ -1,5 +1,11 @@
 #pragma once
 
+//////////////////////////////////////////////////////////////
+/// Следующие 5 интерфейсов отвечают за столкновения с каким-либо
+/// обьектом. Если класс подразумевается под собой столкновение,
+/// например, с блоком, он должен унаследовать ICollisionWithBlockAble
+/// и реализовать метод handlingCollision(Block& block).
+//////////////////////////////////////////////////////////////
 class ICollisionWithBlockAble
 {
 protected:
@@ -13,6 +19,7 @@ protected:
 
 };
 
+// Аналогично
 class ICollisionWithItemAble
 {
 protected:
@@ -26,6 +33,7 @@ protected:
 
 };
 
+// Аналогично.
 class ICollisionWithEnemyAble
 {
 protected:
@@ -37,8 +45,9 @@ protected:
 
 	virtual void handlingCollision(Enemy& enemy) = 0;
 
-};
+}; 
 
+// Аналогично.
 class ICollisionWithPlatformAble
 {
 protected:
@@ -52,15 +61,21 @@ protected:
 
 };
 
+//////////////////////////////////////////////////////////////
+/// Интерфейс IMoveAble отвечает за передвижение. Если что-то
+/// должно двигаться в игре, то оно реализует данный интерфейс.
+//////////////////////////////////////////////////////////////
 class IMoveAble : virtual public Position
 {
 protected:
 
+	// Скорость и ускорение по осям.
 	sf::Vector2f speed_;
 	sf::Vector2f acceleration_;
 
 	float speed_value_;
 
+	// Конструктор с инициализацией по умолчанию.
 	IMoveAble(float speed) :
 		speed_({0.0f, 0.0f}),
 		acceleration_({0.0f, 0.0f}),
@@ -69,6 +84,7 @@ protected:
 
 	}
 
+	// Метод для обновления позиции.
 	void updateByMove()
 	{
 		speed_ += acceleration_;
@@ -76,24 +92,35 @@ protected:
 	}
 };
 
+//////////////////////////////////////////////////////////////
+/// Интерфейс IAnimationAble отвечает за анимацию и предоставляет
+/// готовый метод для анимации. Если что-то должно анимироваться, то
+/// следует просто унаследовать IAnimationAble.
+//////////////////////////////////////////////////////////////
 class IAnimationAble : public sf::Drawable
 {
 private:
 
+	// Текуший кадр.
 	float current_frame_;
+	// Скорость анимации.
 	float speed_anim_;
+	// Количество кадров.
 	int frames_;
 
+	// Текстура, спрайт, размер.
 	sf::Texture texture_;
 	sf::Sprite sprite_;
 	sf::Vector2f size_;
 
+	// Направление взгляда.
 	enum ViewDirectionState
 	{
 		Left,
 		Right
 	};
 
+	// Состояние анимации.
 	enum AnimationState
 	{
 		MoveLeft,
@@ -105,6 +132,7 @@ private:
 	ViewDirectionState view_state_;
 	AnimationState anim_state_;
 
+	// Загрузка текстур.
 	void loadFiles(const std::string path_texture)
 	{
 		texture_.loadFromFile(path_texture);
@@ -113,6 +141,7 @@ private:
 
 protected:
 	
+	// Конструктор для инициализации.
 	IAnimationAble(std::string path_texture, int frames, float speed_anim, sf::Vector2f size) : 
 		speed_anim_(speed_anim),
 		frames_(frames),
@@ -124,13 +153,16 @@ protected:
 		loadFiles(path_texture);
 	}
 
+	// Метод смены кадров анимации.
 	virtual void changeFrameAnimation(float time)
 	{
+		// Проверяем на предел.
 		if (current_frame_ > frames_ - 1)
 		{
 			current_frame_ -= frames_ - 1;
 		}
 
+		// В зависимости от состояния, выводим нужную анимацию.
 		switch (anim_state_)
 		{
 		case AnimationState::MoveLeft:
@@ -153,10 +185,12 @@ protected:
 			break;
 		}
 
+		// Увеличиваем кадр.
 		current_frame_ += time * speed_anim_;
 
 	}
 
+	// Отрисовываем спрайт.
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 	{
 		target.draw(sprite_);

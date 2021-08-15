@@ -1,4 +1,9 @@
 #pragma once
+
+//////////////////////////////////////////////////////////////
+/// Темплейт, который осуществляет проверку столкновения 
+/// двух прямоугольников.
+//////////////////////////////////////////////////////////////
 template<typename _Value_type_0, typename _Value_type_1>
 inline bool collision_square_position(sf::Vector2<sf::Vector2<_Value_type_0> > vsq0, sf::Vector2<sf::Vector2<_Value_type_1> > vsq1)
 {
@@ -123,6 +128,7 @@ inline bool collision_square_position(sf::Vector2<sf::Vector2<_Value_type_0> > v
 	return false;
 }
 
+// Перегружаем оператор &
 template<typename _Value_type_0, typename _Value_type_1>
 inline bool operator & (sf::Vector2<sf::Vector2<_Value_type_0> > vsq0, sf::Vector2<sf::Vector2<_Value_type_1> > vsq1)
 {
