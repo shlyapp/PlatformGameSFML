@@ -57,9 +57,12 @@ public:
 
 	void draw(sf::RenderTarget& target, sf::RenderStates state) const override
 	{
+		notifyListeners(GameEventState::inGame);
+
 		game_time_ = clock_.getElapsedTime().asSeconds();
 
 		target.draw(*LevelManager::level->map);
+
 	}
 
 	void updateByGameEvent(GameEventState event) override

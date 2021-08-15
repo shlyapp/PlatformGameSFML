@@ -1,8 +1,14 @@
 #pragma once
 
+//////////////////////////////////////////////////////////////
+/// GameEventState описывает события, которые могут происходить
+/// в игре и это помогает работать остальным классам.
+//////////////////////////////////////////////////////////////
+
 enum class GameEventState
 {
 	None,
+	inMenu,
 	StartGame,
 	inGame,
 	PlayerDied,
@@ -10,7 +16,14 @@ enum class GameEventState
 	GameOver
 };
 
+// Глобально храним состояние игры.
 GameEventState GAME_STATE;
+
+//////////////////////////////////////////////////////////////
+/// IGameEventListener - интерфейс слушателя событий,
+/// происходящих в игре. Если какому-то классу необходимо знать
+/// о состоянии игры, то он реализует данные интерфейс.
+//////////////////////////////////////////////////////////////
 
 class IGameEventListener
 {
@@ -20,6 +33,13 @@ public:
 
 };
 
+//////////////////////////////////////////////////////////////
+/// IGameEventMaker - если какой-то класс может менять состоянии игры
+/// то он наследует данный класс. Например: класс Player должен наследовать
+/// этот класс, чтобы при своей смерти он оповестил других, а игра в свою очередь
+/// получила бы это оповещение и сделала бы нового игрока или закончила игру.
+//////////////////////////////////////////////////////////////
+
 class IGameEventMaker
 {
 private:
@@ -28,16 +48,20 @@ private:
 
 protected:
 
-	void notifyListeners(GameEventState event)
+	void notifyListeners(GameEventState event) const
 	{
 		if (event != GAME_STATE)
 		{
 			GAME_STATE = event;
-
+			
+			// Для удобного дебага, выводим состояние в консоль.
 			switch (GAME_STATE)
 			{
 			case GameEventState::StartGame:
 				std::cout << "start game!\n";
+				break;
+			case GameEventState::inMenu:
+				std::cout << "in menu!\n";
 				break;
 			case GameEventState::inGame:
 				std::cout << "in game!\n";
