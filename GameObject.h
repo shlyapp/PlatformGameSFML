@@ -281,6 +281,10 @@ public:
 	}
 };
 
+//////////////////////////////////////////////////////////////
+///  ласс Player €вл€етс€ основным, он описывает поведение игрока
+/// его передвижение и обрабатывает столковени€ со всеми€ обьектами.
+//////////////////////////////////////////////////////////////
 class Player:
 	public ICollisionWithBlockAble, public ICollisionWithEnemyAble, public ICollisionWithItemAble, public ICollisionWithPlatformAble,
 	public IMoveAble,
@@ -290,11 +294,15 @@ class Player:
 {
 private:
 
+	// Ћогический флаг нахождени€ персонажа на земле.
 	bool on_ground_;
+	//  оличество собраных шестерней.
 	int gears_;
 
+	//  амера, котора€ следит за персонажем.
 	Camera camera_;
 
+	// ѕроверка на столкновение с кра€ми карты.
 	void handlingCollisionWithBorder()
 	{
 		if (LevelManager::level->map->size.x * 50 < this->position_.x)
@@ -315,6 +323,7 @@ private:
 
 public:
 
+	//  онструктор дл€ инициализации по умолчанию.
 	Player(sf::Vector2f position, sf::Vector2f size, sf::View* view, std::string path_texture) :
 		IMoveAble(5.0f),
 		IAnimationAble(path_texture, 9, 0.01f, size),
@@ -327,6 +336,7 @@ public:
 
 	}
 
+	// ќбвление персонажа, тут происходит логика движени€.
 	void update(const float time) override
 	{
 		acceleration_.y += 0.02f;
@@ -369,6 +379,7 @@ public:
 		camera_.updateByPosition(position_);
 	}
 
+	// ћетод дл€ обработки стокновений.
 	void handlingCollision(Block& block) override
 	{
 		switch (block.getType())
