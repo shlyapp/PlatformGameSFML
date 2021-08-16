@@ -441,6 +441,7 @@ public:
 
 		if (item.getType() == ItemType::Star)
 		{
+			item.deactivate();
 			LevelManager::setNewLevel();
 		}
 	}

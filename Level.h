@@ -374,4 +374,11 @@ public:
 		level = levels_[num_level_];
 	}
 
+	static void deleteLevels()
+	{
+		levels_.clear();
+		
+		num_level_ = -1;
+	}
+
 };

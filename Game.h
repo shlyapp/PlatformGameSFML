@@ -133,7 +133,8 @@ public:
 			break;
 
 		case GameEventState::RestartGame:
-			restartGame();
+			LevelManager::deleteLevels();
+			GameLoader::loadGame(this, view_);
 			break;
 		}
 
@@ -189,9 +190,22 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	{
 		Item* item = *it;
 
+		std::cout << LevelManager::level->map->items.size() << std::endl;
+
+		if (LevelManager::level->map->items.size() == 0)
+		{
+			break;
+		}
+
 		if (game->main_player_->getRect2f() & item->getRect2f())
 		{
 			game->main_player_->handlingCollision(*item);
+		}
+
+		// Если в процессе сменился уровень, то выходим из цикла.
+		if (GAME_STATE == GameEventState::SetNewLevel)
+		{
+			break;
 		}
 
 		if (!item->isActive())
@@ -242,6 +256,8 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 inline void GameLoader::loadGame(Game* game, sf::View* view)
 {
 	game->game_clock_->restart();
+
+	game->lives_ = 3;
 	 
 	// Загрузка уровней.
 
