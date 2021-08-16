@@ -29,7 +29,7 @@ private:
 	sf::View view_;
 	sf::RenderWindow* window_;
 
-	sf::View view;
+	sf::View view_menu_;
 
 public:
 
@@ -48,7 +48,7 @@ public:
 		menu_->addListener(game_);
 		menu_->addListener(this);
 
-		view.reset(sf::FloatRect(0, 0, 1280, 720));
+		view_menu_.reset(sf::FloatRect(0, 0, 1280, 720));
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
@@ -58,6 +58,7 @@ public:
 		{
 		case SceneState::InMenu:
 			target.draw(*menu_);
+			target.setView(view_menu_);
 			break;
 		case SceneState::InGame:
 			target.draw(*game_);
@@ -65,7 +66,7 @@ public:
 			break;
 		case SceneState::GameOver:
 			target.draw(*game_over_);
-			target.setView(view);
+			target.setView(view_menu_);
 			break;
 		default:
 			break;
@@ -84,7 +85,7 @@ public:
 		// Если игра закончилась, то изменяем на "Игра окончена."
 		if (event == GameEventState::GameOver)
 		{
-			window_->setView(view);
+			//window_->setView(view);
 			state_ = SceneState::GameOver;
 		}
 		

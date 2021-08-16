@@ -30,11 +30,13 @@ class Item : public Entity
 private:
 
 	ItemType type;
+	bool is_active_;
 
 public:
 
 	Item(sf::Vector2f position, sf::Vector2f size, ItemType type) : Entity(position, size),
-		type(type)
+		type(type),
+		is_active_(true)
 	{
 
 	}
@@ -42,6 +44,16 @@ public:
 	ItemType getType() const
 	{
 		return type;
+	}
+
+	void deactivate()
+	{
+		is_active_ = false;
+	}
+
+	bool isActive() const
+	{
+		return is_active_;
 	}
 
 };
@@ -235,6 +247,11 @@ public:
 
 			}
 		}
+	}
+
+	void changeSmbol(const sf::Vector2f position, const char symbol)
+	{
+		tileMap[position.y][position.x] = symbol;
 	}
 
 };

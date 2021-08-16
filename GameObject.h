@@ -303,7 +303,7 @@ private:
 	// Логический флаг нахождения персонажа на земле.
 	bool on_ground_;
 	// Количество собраных шестерней.
-	int gears_;
+	inline static int gears_ = 0;
 
 	// Камера, которая следит за персонажем.
 	Camera camera_;
@@ -336,10 +336,15 @@ public:
 		Entity(position, size),
 		GameEntity(100.0f, 1000.0f),
 
-		camera_(view, {10, 20}),
-		gears_(0)
+		camera_(view, {10, 20})
 	{
 
+	}
+
+	~Player()
+	{
+		gears_ = 0;
+		std::cout << gears_ << std::endl;
 	}
 
 	// Обвление персонажа, тут происходит логика движения.
@@ -425,6 +430,15 @@ public:
 
 	void handlingCollision(Item& item) override
 	{
+		if (item.getType() == ItemType::Gear)
+		{
+			gears_++;
+
+			LevelManager::level->map->changeSmbol(sf::Vector2f{ item.getRect2f().x.x / 50.0f, item.getRect2f().x.y / 50.0f }, '-');
+
+			item.deactivate();
+		}
+
 		if (item.getType() == ItemType::Star)
 		{
 			LevelManager::setNewLevel();
@@ -634,9 +648,9 @@ public:
 
 	void updateBullets(Player& player)
 	{
-		for (it_ = bullets_.begin(); it_ != bullets_.end(); it_++)
+		for (auto it = bullets_.begin(); it != bullets_.end(); ++it)
 		{
-			Bullet* bullet = *it_;
+			Bullet* bullet = *it;
 
 			bullet->update();
 
@@ -647,10 +661,11 @@ public:
 
 			if (!bullet->isLive())
 			{
-				it_ = bullets_.erase(it_);
+				it = bullets_.erase(it);
 				delete bullet;
 			}
 		}
+
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override

@@ -91,10 +91,7 @@ public:
 
 		for (auto enemy : LevelManager::level->enemys)
 		{
-			if (enemy->isLive())
-			{
-				target.draw(*enemy);
-			}	
+			target.draw(*enemy);
 		}
 
 		for (auto moving_platform : LevelManager::level->moving_platforms)
@@ -188,25 +185,38 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 		}
 	}
 
-	for (auto item : LevelManager::level->map->items)
+	for (auto it = LevelManager::level->map->items.begin(); it != LevelManager::level->map->items.end(); ++it)
 	{
+		Item* item = *it;
+
 		if (game->main_player_->getRect2f() & item->getRect2f())
 		{
 			game->main_player_->handlingCollision(*item);
 		}
+
+		if (!item->isActive())
+		{
+			it = LevelManager::level->map->items.erase(it);
+			delete item;
+		}
 	}
 
-	for (auto enemy : LevelManager::level->enemys)
+	for (auto it = LevelManager::level->enemys.begin(); it != LevelManager::level->enemys.end(); ++it)
 	{
-		if (enemy->isLive())
-		{
-			enemy->update(time);
+		Enemy* enemy = *it;
 
-			if (game->main_player_->getRect2f() & enemy->getRect2f())
-			{
-				game->main_player_->handlingCollision(*enemy);
-			}
-		}	
+		enemy->update(time);
+
+		if (game->main_player_->getRect2f() & enemy->getRect2f())
+		{
+			game->main_player_->handlingCollision(*enemy);
+		}
+
+		if (!enemy->isLive())
+		{
+			it = LevelManager::level->enemys.erase(it);
+			delete enemy;
+		}
 	}
 
 	for (auto moving_platform : LevelManager::level->moving_platforms)
