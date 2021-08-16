@@ -240,6 +240,9 @@ class IShootAble
 {
 protected:
 
+	std::list <Bullet*> bullets_;
+	std::list <Bullet*>::iterator it_;
+
 	virtual void takeShoot() = 0;
 
 };

@@ -334,7 +334,7 @@ public:
 		IMoveAble(5.0f),
 		IAnimationAble(path_texture, 9, 0.01f, size),
 		Entity(position, size),
-		GameEntity(10000.0f, 50.0f),
+		GameEntity(100.0f, 1000.0f),
 
 		camera_(view, {10, 20}),
 		gears_(0)
@@ -433,9 +433,10 @@ public:
 
 	void handlingCollision(Enemy& enemy) override
 	{
-		if (enemy.getRect2f().y.y > this->getRect2f().y.y)
+		if (acceleration_.y > 0)
 		{
 			enemy.dealDamage(damage_);
+			speed_.y = -28;
 		}
 		else
 		{
@@ -460,11 +461,7 @@ public:
 	}
 };
 
-std::list <Bullet*> bullets_;
-std::list <Bullet*>::iterator it_;
-
 class Bullet :
-	public ICollisionWithBlockAble,
 	public ICollisionWithPlayerAble,
 	public sf::Drawable,
 	public Entity,
@@ -491,7 +488,6 @@ private:
 		{
 			sprite_.setTexture(texture_);
 		}
-		
 	}
 
 public:
@@ -512,11 +508,6 @@ public:
 		is_live_(true)
 	{
 		loadFiles();	
-	}
-
-	~Bullet()
-	{
-		std::cout << "delete!\n";
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
@@ -543,19 +534,20 @@ public:
 		{
 			is_live_ = false;
 		}
+
+		if (position_.x < 0)
+		{
+			is_live_ = false;
+		}
 	}
 
 	void handlingCollision(Player& player) override
 	{
 		player.dealDamage(10);
+		is_live_ = false;
 	}
 
-	void handlingCollision(Block& block) override
-	{
-		delete this;
-	}
-
-	bool isLive()
+	bool isLive() const
 	{
 		return is_live_;
 	}
@@ -637,20 +629,27 @@ public:
 		IMoveAble::updateByMove();
 		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
 		changeFrameAnimation(time);
+	}
 
+	void updateBullets(Player& player)
+	{
 		for (it_ = bullets_.begin(); it_ != bullets_.end(); it_++)
 		{
-			Bullet* b = *it_;
+			Bullet* bullet = *it_;
 
-			b->update();
+			bullet->update();
 
-			if (!b->isLive())
+			if (bullet->getRect2f() & player.getRect2f())
+			{
+				bullet->handlingCollision(player);
+			}
+
+			if (!bullet->isLive())
 			{
 				it_ = bullets_.erase(it_);
-				delete b;
+				delete bullet;
 			}
 		}
-	
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override

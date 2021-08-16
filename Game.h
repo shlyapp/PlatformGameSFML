@@ -91,7 +91,10 @@ public:
 
 		for (auto enemy : LevelManager::level->enemys)
 		{
-			target.draw(*enemy);
+			if (enemy->isLive())
+			{
+				target.draw(*enemy);
+			}	
 		}
 
 		for (auto moving_platform : LevelManager::level->moving_platforms)
@@ -183,12 +186,15 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 
 	for (auto enemy : LevelManager::level->enemys)
 	{
-		enemy->update(time);
-
-		if (game->main_player_->getRect2f() & enemy->getRect2f())
+		if (enemy->isLive())
 		{
-			game->main_player_->handlingCollision(*enemy);
-		}
+			enemy->update(time);
+
+			if (game->main_player_->getRect2f() & enemy->getRect2f())
+			{
+				game->main_player_->handlingCollision(*enemy);
+			}
+		}	
 	}
 
 	for (auto moving_platform : LevelManager::level->moving_platforms)
@@ -204,6 +210,7 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	if (LevelManager::level->boss != nullptr)
 	{
 		LevelManager::level->boss->update(time);
+		LevelManager::level->boss->updateBullets(*game->main_player_);
 	}
 
 	game->info_->update(game->main_player_->getHealth(), game->lives_, game->game_time_, game->main_player_->getGearsNum(), *game->view_);
@@ -217,7 +224,8 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 	// Загрузка уровней.
 
 	Level* level1(new Level(new Map(sf::Vector2f{ 26, 15 }, "data/images/textures.png", "data/maps/firstMap.txt"), sf::Vector2f{ 100, 100 }));
-	level1->addMovingPlatform(new MovingPlatform(200, { 0, 500 }, { 150, 50 }, "data/images/platform.png"));
+	level1->addMovingPlatform(new MovingPlatform(200, sf::Vector2f{ 0, 500 }, sf::Vector2f{ 150, 50 }, "data/images/platform.png"));
+	level1->addEnemy(new Enemy(340, sf::Vector2f{ 200, 500 }, sf::Vector2f{ 35, 48 }, "data/images/chip.png"));
 
 	LevelManager::addLevel(level1);
 	
@@ -229,8 +237,8 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 
 	// Загружаем персонажа.
 
-	game->player1_ = new Player(LevelManager::level->start_position, { 49, 112 }, view, "data/images/player.png");
-	game->player2_ = new Player(LevelManager::level->start_position, { 49, 112 }, view, "data/images/player.png");
+	game->player1_ = new Player(LevelManager::level->start_position, sf::Vector2f{ 49, 112 }, view, "data/images/player.png");
+	game->player2_ = new Player(LevelManager::level->start_position, sf::Vector2f{ 49, 112 }, view, "data/images/player.png");
 
 	game->main_player_ = game->player1_;
 
