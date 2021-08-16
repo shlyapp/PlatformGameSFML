@@ -75,6 +75,21 @@ protected:
 	virtual void handlingCollision(Player& player) = 0;
 };
 
+class GameEntity;
+
+class ICollisionWithBossAble
+{
+protected:
+
+	ICollisionWithBossAble()
+	{
+
+	}
+
+	virtual void handlingCollision(GameEntity& boss) = 0;
+
+};
+
 //////////////////////////////////////////////////////////////
 /// Интерфейс IMoveAble отвечает за передвижение. Если что-то
 /// должно двигаться в игре, то оно реализует данный интерфейс.

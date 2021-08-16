@@ -291,7 +291,7 @@ public:
 /// его передвижение и обрабатывает столковения со всемия обьектами.
 //////////////////////////////////////////////////////////////
 class Player:
-	public ICollisionWithBlockAble, public ICollisionWithEnemyAble, public ICollisionWithItemAble, public ICollisionWithPlatformAble,
+	public ICollisionWithBlockAble, public ICollisionWithEnemyAble, public ICollisionWithItemAble, public ICollisionWithPlatformAble, public ICollisionWithBossAble,
 	public IGameEventMaker,
 	public IMoveAble,
 	public IAnimationAble,
@@ -334,7 +334,7 @@ public:
 		IMoveAble(5.0f),
 		IAnimationAble(path_texture, 9, 0.01f, size),
 		Entity(position, size),
-		GameEntity(100.0f, 1000.0f),
+		GameEntity(100.0f, 100.0f),
 
 		camera_(view, {10, 20})
 	{
@@ -412,11 +412,11 @@ public:
 		case BlockType::Border:
 			if (speed_.x > 0)
 			{
-				position_.x = block.getRect2f().x.x - size_.x + 10;
+				position_.x = block.getRect2f().x.x - size_.x;
 			}
 			else if (speed_.x < 0)
 			{
-				position_.x = block.getRect2f().y.x - 10;
+				position_.x = block.getRect2f().y.x;
 			}
 			break;
 		case BlockType::Spikes:
@@ -448,10 +448,10 @@ public:
 
 	void handlingCollision(Enemy& enemy) override
 	{
-		if (acceleration_.y > 0)
+		if (speed_.y > 0)
 		{
 			enemy.dealDamage(damage_);
-			speed_.y = -28 / (4 / 2) / 2 + 2 / 4;
+			speed_.y = -15;
 		}
 		else
 		{
@@ -461,13 +461,27 @@ public:
 
 	void handlingCollision(MovingPlatform& platform) override
 	{
-		if (getRect2f().y.y <= platform.getRect2f().y.y)
+		if (getRect2f().y.y <= platform.getRect2f().y.y && speed_.x >= 0)
 		{
 			position_.y -= speed_.y;
 			on_ground_ = true;
 			speed_.y = 0;
 			anim_state_ = AnimationState::Stay;
+		}
+	}
 
+	void handlingCollision(GameEntity& boss) override
+	{
+		std::cout << boss.getHealth() << std::endl;
+
+		if (speed_.y > 0)
+		{
+			boss.dealDamage(damage_);
+			speed_.y = -15;
+		}
+		else
+		{
+			this->dealDamage(boss.getDamageValue());
 		}
 	}
 
@@ -516,14 +530,14 @@ public:
 
 	mutable Direction dir_;
 
-	Bullet(sf::Vector2f position, Direction dir) : 
+	Bullet(sf::Vector2f position, Direction dir) :
 		IMoveAble(6.0f),
-		Entity(position, sf::Vector2f{30.0f, 10.0f}),
+		Entity(position, sf::Vector2f{ 30.0f, 10.0f }),
 
 		dir_(dir),
 		is_live_(true)
 	{
-		loadFiles();	
+		loadFiles();
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
@@ -588,14 +602,14 @@ public:
 
 	Boss(float y, sf::Vector2f control_points, sf::Vector2f size, std::string path_texture) :
 		Entity(sf::Vector2f(control_points.x, y), size),
-		GameEntity(1000, 30),
+		GameEntity(500, 1),
 		IAnimationAble(path_texture, 4, 0.01f, size),
 		IMoveAble(2.0f),
-	
+
 		control_points_(control_points),
 		time_shoot_(0)
 	{
-		
+
 	}
 
 	void takeShoot() override
@@ -615,7 +629,7 @@ public:
 		if (clock_.getElapsedTime().asMilliseconds() > time_shoot_ + 2000)
 		{
 			takeShoot();
-			
+
 			time_shoot_ = clock_.getElapsedTime().asMilliseconds();
 		}
 
@@ -645,6 +659,7 @@ public:
 		IMoveAble::updateByMove();
 		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
 		changeFrameAnimation(time);
+
 	}
 
 	void updateBullets(Player& player)

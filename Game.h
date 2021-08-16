@@ -103,7 +103,10 @@ public:
 
 		if (LevelManager::level->boss != nullptr)
 		{
-			target.draw(*LevelManager::level->boss);
+			if (LevelManager::level->boss->isLive())
+			{
+				target.draw(*LevelManager::level->boss);
+			}
 		}
 
 		target.draw(*main_player_);
@@ -190,8 +193,6 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	{
 		Item* item = *it;
 
-		std::cout << LevelManager::level->map->items.size() << std::endl;
-
 		if (LevelManager::level->map->items.size() == 0)
 		{
 			break;
@@ -245,8 +246,16 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	
 	if (LevelManager::level->boss != nullptr)
 	{
-		LevelManager::level->boss->update(time);
-		LevelManager::level->boss->updateBullets(*game->main_player_);
+		if (LevelManager::level->boss->isLive())
+		{
+			LevelManager::level->boss->update(time);
+			LevelManager::level->boss->updateBullets(*game->main_player_);
+
+			if (game->main_player_->getRect2f() & LevelManager::level->boss->getRect2f())
+			{
+				game->main_player_->handlingCollision(*LevelManager::level->boss);
+			}
+		}
 	}
 
 	game->info_->update(game->main_player_->getHealth(), game->lives_, game->game_time_, game->main_player_->getGearsNum(), *game->view_);
