@@ -460,12 +460,19 @@ public:
 	}
 };
 
+std::list <Bullet*> bullets_;
+std::list <Bullet*>::iterator it_;
+
 class Bullet :
+	public ICollisionWithBlockAble,
+	public ICollisionWithPlayerAble,
 	public sf::Drawable,
 	public Entity,
 	public IMoveAble
 {
 private:
+
+	bool is_live_;
 
 	inline static sf::Texture texture_;
 	inline static sf::Texture texture_forward_;
@@ -501,9 +508,15 @@ public:
 		IMoveAble(6.0f),
 		Entity(position, sf::Vector2f{30.0f, 10.0f}),
 
-		dir_(dir)
+		dir_(dir),
+		is_live_(true)
 	{
 		loadFiles();	
+	}
+
+	~Bullet()
+	{
+		std::cout << "delete!\n";
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
@@ -513,6 +526,7 @@ public:
 
 	void update()
 	{
+
 		if (dir_ == Direction::Right)
 		{
 			speed_.x = speed_value_;
@@ -524,6 +538,26 @@ public:
 
 		IMoveAble::updateByMove();
 		sprite_.setPosition(position_);
+
+		if (position_.x > LevelManager::level->map->size.x * 50)
+		{
+			is_live_ = false;
+		}
+	}
+
+	void handlingCollision(Player& player) override
+	{
+		player.dealDamage(10);
+	}
+
+	void handlingCollision(Block& block) override
+	{
+		delete this;
+	}
+
+	bool isLive()
+	{
+		return is_live_;
 	}
 
 };
@@ -604,11 +638,19 @@ public:
 		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
 		changeFrameAnimation(time);
 
-		for (auto bullet : bullets_)
+		for (it_ = bullets_.begin(); it_ != bullets_.end(); it_++)
 		{
-			bullet->update();
-		}
+			Bullet* b = *it_;
 
+			b->update();
+
+			if (!b->isLive())
+			{
+				it_ = bullets_.erase(it_);
+				delete b;
+			}
+		}
+	
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
