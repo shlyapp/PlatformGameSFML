@@ -192,7 +192,7 @@ private:
 public:
 
 	GameOverMenu(sf::RenderWindow* window) :
-		new_game_(new gui::TextBlock(sf::Vector2f(520, 300), "Начать заново.", window))
+		new_game_(new gui::TextBlock(sf::Vector2f(500, 300), "Начать заново.", window))
 	{
 		loadFiles();
 		new_game_->addListener(this);
@@ -211,6 +211,66 @@ public:
 		{
 			notifyListeners(GameEventState::RestartGame);
 		}
+	}
+
+};
+
+class WinMenu : public sf::Drawable
+{
+private:
+
+	sf::Texture texture_;
+	sf::Sprite sprite_;
+
+	gui::TextBlock* text_;
+
+	void loadFiles()
+	{
+		texture_.loadFromFile("data/images/menu.png");
+		sprite_.setTexture(texture_);
+	}
+
+public:
+
+	WinMenu(sf::RenderWindow* window) :
+		text_(new gui::TextBlock(sf::Vector2f(500, 320), "Игра пройдена!", window))
+	{
+		loadFiles();
+		text_->disableInteractivity();
+		text_->setCharacterSize(50.0f);
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
+	{
+		target.draw(sprite_);
+		target.draw(*text_);
+	}
+
+};
+
+class BossInfoBar : public sf::Drawable
+{
+private:
+	
+	gui::TextBlock* health_;
+
+public:
+
+	BossInfoBar(sf::RenderWindow* window) : health_(new gui::TextBlock(sf::Vector2f{0.0f, 0.0f}, "Здоровье босса: ", window))
+	{
+		health_->disableInteractivity();
+		health_->setColor(sf::Color::Red);
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
+	{
+		target.draw(*health_);
+	}
+
+	void update(const int health, sf::View& view)
+	{
+		health_->setText("Здоровье босса: " + std::to_string(health));
+		health_->setPosition(view.getCenter() + sf::Vector2f(20, -200));
 	}
 
 };

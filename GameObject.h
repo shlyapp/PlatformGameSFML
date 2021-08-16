@@ -336,7 +336,8 @@ public:
 		Entity(position, size),
 		GameEntity(100.0f, 100.0f),
 
-		camera_(view, {10, 20})
+		camera_(view, { 10, 20 }),
+		on_ground_(false)
 	{
 
 	}
@@ -472,8 +473,6 @@ public:
 
 	void handlingCollision(GameEntity& boss) override
 	{
-		std::cout << boss.getHealth() << std::endl;
-
 		if (speed_.y > 0)
 		{
 			boss.dealDamage(damage_);
@@ -482,6 +481,11 @@ public:
 		else
 		{
 			this->dealDamage(boss.getDamageValue());
+		}
+
+		if (boss.getHealth() == 0)
+		{
+			notifyListeners(GameEventState::WinGame);
 		}
 	}
 
@@ -547,7 +551,6 @@ public:
 
 	void update()
 	{
-
 		if (dir_ == Direction::Right)
 		{
 			speed_.x = speed_value_;
@@ -573,7 +576,7 @@ public:
 
 	void handlingCollision(Player& player) override
 	{
-		player.dealDamage(10);
+		player.dealDamage(50);
 		is_live_ = false;
 	}
 
@@ -597,6 +600,7 @@ private:
 
 	sf::Clock clock_;
 	float time_shoot_;
+	float time_recovery_;
 
 public:
 
@@ -607,7 +611,8 @@ public:
 		IMoveAble(2.0f),
 
 		control_points_(control_points),
-		time_shoot_(0)
+		time_shoot_(0),
+		time_recovery_(0)
 	{
 
 	}
@@ -631,6 +636,14 @@ public:
 			takeShoot();
 
 			time_shoot_ = clock_.getElapsedTime().asMilliseconds();
+		}
+
+		if (clock_.getElapsedTime().asSeconds() > time_recovery_ + 3)
+		{
+			setHealth(getHealth() + 50);
+
+			time_recovery_ = clock_.getElapsedTime().asSeconds();
+
 		}
 
 		if (anim_state_ == AnimationState::MoveRight)

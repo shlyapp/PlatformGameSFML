@@ -15,7 +15,8 @@ private:
 	{
 		InMenu,
 		InGame,
-		GameOver
+		GameOver,
+		WinGame
 	};
 
 	// Состояние текущее.
@@ -25,6 +26,7 @@ private:
 	Menu* menu_;
 	Game* game_;
 	GameOverMenu* game_over_;
+	WinMenu* win_menu_;
 
 	sf::View view_;
 	sf::RenderWindow* window_;
@@ -37,6 +39,7 @@ public:
 		menu_(new Menu("data/images/menu.png", "data/images/info.png", window)),
 		game_(new Game(window, &view_)),
 		game_over_(new GameOverMenu(window)),
+		win_menu_(new WinMenu(window)),
 		window_(window),
 		state_(SceneState::InMenu)
 	{
@@ -68,7 +71,9 @@ public:
 			target.draw(*game_over_);
 			target.setView(view_menu_);
 			break;
-		default:
+		case SceneState::WinGame:
+			target.draw(*win_menu_);
+			target.setView(view_menu_);
 			break;
 		}
 	}
@@ -92,6 +97,11 @@ public:
 		if (event == GameEventState::RestartGame)
 		{
 			state_ = SceneState::InGame;
+		}
+
+		if (event == GameEventState::WinGame)
+		{
+			state_ = SceneState::WinGame;
 		}
 	}
 

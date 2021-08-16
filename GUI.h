@@ -226,6 +226,11 @@ namespace gui
 			colors_ = { color_in_enter, color_in_leave };
 		}
 
+		void setColor(sf::Color color)
+		{
+			text_.setFillColor(color);
+		}
+
 		// Для выключения смены цветов и оповещения, если TextBlock должен быть просто статичным.
 		void disableInteractivity()
 		{

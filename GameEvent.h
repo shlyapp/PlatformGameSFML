@@ -9,6 +9,7 @@ enum class GameEventState
 	None,
 	inMenu,
 	RestartGame,
+	WinGame,
 	StartGame,
 	inGame,
 	PlayerDied,
@@ -58,6 +59,9 @@ protected:
 			{
 			case GameEventState::StartGame:
 				std::cout << "start game!\n";
+				break;
+			case GameEventState::WinGame:
+				std::cout << "win game!\n";
 				break;
 			case GameEventState::RestartGame:
 				std::cout << "restart game!\n";

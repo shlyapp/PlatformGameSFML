@@ -57,6 +57,7 @@ private:
 	Player* player2_;
 
 	PlayerInfoBar* info_;
+	BossInfoBar* boss_info_;
 
 public:
 
@@ -106,6 +107,7 @@ public:
 			if (LevelManager::level->boss->isLive())
 			{
 				target.draw(*LevelManager::level->boss);
+				target.draw(*boss_info_);
 			}
 		}
 
@@ -251,6 +253,8 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 			LevelManager::level->boss->update(time);
 			LevelManager::level->boss->updateBullets(*game->main_player_);
 
+			game->boss_info_->update(LevelManager::level->boss->getHealth(), *game->view_);
+
 			if (game->main_player_->getRect2f() & LevelManager::level->boss->getRect2f())
 			{
 				game->main_player_->handlingCollision(*LevelManager::level->boss);
@@ -276,9 +280,13 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 
 	LevelManager::addLevel(level1);
 	
-	Level* level2(new Level(new Map(sf::Vector2f{ 15, 10 }, "data/images/textures.png", "data/maps/secondMap.txt"), sf::Vector2f{ 100, 100 }));
-	level2->addBoss(new Boss(300, sf::Vector2f{ 100, 600 }, sf::Vector2f{ 123, 144 }, "data/images/boss.png"));
+	Level* level2(new Level(new Map(sf::Vector2f{ 15, 10 }, "data/images/textures.png", "data/maps/secondMap.txt"), sf::Vector2f{ 50, 100 }));
+	level2->addMovingPlatform(new MovingPlatform(300, sf::Vector2f(100, 300), sf::Vector2f(150, 50), "data/images/platform.png"));
 	LevelManager::addLevel(level2);
+
+	Level* level3(new Level(new Map(sf::Vector2f{ 15, 10 }, "data/images/textures.png", "data/maps/thirdMap.txt"), sf::Vector2f{ 100, 100 }));
+	level3->addBoss(new Boss(300, sf::Vector2f{ 100, 600 }, sf::Vector2f{ 123, 144 }, "data/images/boss.png"));
+	LevelManager::addLevel(level3);
 
 	LevelManager::setNewLevel();
 
@@ -290,4 +298,5 @@ inline void GameLoader::loadGame(Game* game, sf::View* view)
 	game->main_player_ = game->player1_;
 
 	game->info_ = new PlayerInfoBar(game->window_);
+	game->boss_info_ = new BossInfoBar(game->window_);
 }
