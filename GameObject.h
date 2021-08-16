@@ -292,6 +292,7 @@ public:
 //////////////////////////////////////////////////////////////
 class Player:
 	public ICollisionWithBlockAble, public ICollisionWithEnemyAble, public ICollisionWithItemAble, public ICollisionWithPlatformAble,
+	public IGameEventMaker,
 	public IMoveAble,
 	public IAnimationAble,
 	public Entity,
@@ -310,9 +311,9 @@ private:
 	// Проверка на столкновение с краями карты.
 	void handlingCollisionWithBorder()
 	{
-		if (LevelManager::level->map->size.x * 50 < this->position_.x)
+		if (LevelManager::level->map->size.x * 50 - size_.x < this->position_.x)
 		{
-			setPosition(sf::Vector2f(LevelManager::level->map->size.x * 50, getPosition().y));
+			setPosition(sf::Vector2f(LevelManager::level->map->size.x * 50 - size_.x, getPosition().y));
 		}
 
 		if (this->position_.x < 0)
@@ -322,7 +323,7 @@ private:
 
 		if (position_.y > LevelManager::level->map->size.y * 50)
 		{
-			this->dealDamage(health_);
+			this->dealDamage(1.0f);
 		}
 	}
 
@@ -333,7 +334,7 @@ public:
 		IMoveAble(5.0f),
 		IAnimationAble(path_texture, 9, 0.01f, size),
 		Entity(position, size),
-		GameEntity(100.0f, 50.0f),
+		GameEntity(10000.0f, 50.0f),
 
 		camera_(view, {10, 20}),
 		gears_(0)
@@ -344,6 +345,11 @@ public:
 	// Обвление персонажа, тут происходит логика движения.
 	void update(const float time) override
 	{
+		if (is_live_ == false)
+		{
+			notifyListeners(GameEventState::PlayerDied);
+		}
+
 		acceleration_.y += 0.02f;
 		speed_.x = 0;
 
@@ -462,12 +468,23 @@ class Bullet :
 private:
 
 	inline static sf::Texture texture_;
+	inline static sf::Texture texture_forward_;
 	inline static sf::Sprite sprite_;
 
 	void loadFiles()
 	{
 		texture_.loadFromFile("data/images/bullet.png");
-		sprite_.setTexture(texture_);
+		texture_forward_.loadFromFile("data/images/bullet_forward.png");
+
+		if (dir_ == Direction::Left)
+		{
+			sprite_.setTexture(texture_forward_);
+		}
+		else
+		{
+			sprite_.setTexture(texture_);
+		}
+		
 	}
 
 public:
@@ -486,20 +503,7 @@ public:
 
 		dir_(dir)
 	{
-		loadFiles();
-
-		if (dir == Direction::Left)
-		{
-			if (sprite_.getScale() != sf::Vector2f{ -1, 1 })
-			{
-				sprite_.scale(-1, 1);
-			}
-		}
-		else
-		{
-			sprite_.scale(-1, 1);
-		}
-		
+		loadFiles();	
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
@@ -560,7 +564,7 @@ public:
 		}
 		else if (anim_state_ == AnimationState::MoveRight)
 		{
-			bullets_.push_back(new Bullet(position_ + sf::Vector2f(0, size_.y / 2), Bullet::Direction::Right));
+			bullets_.push_back(new Bullet(position_ + sf::Vector2f(size_.x, size_.y / 2), Bullet::Direction::Right));
 		}
 	}
 
@@ -568,23 +572,6 @@ public:
 	{
 		if (clock_.getElapsedTime().asMilliseconds() > time_shoot_ + 2000)
 		{
-			switch (anim_state_)
-			{
-			case IAnimationAble::MoveLeft:
-				std::cout << "left!\n";
-				break;
-			case IAnimationAble::MoveRight:
-				std::cout << "right\n";
-				break;
-			case IAnimationAble::Stay:
-				break;
-			case IAnimationAble::Jump:
-				break;
-			default:
-				break;
-			}
-
-			std::cout << "shoot!\n";
 			takeShoot();
 			
 			time_shoot_ = clock_.getElapsedTime().asMilliseconds();

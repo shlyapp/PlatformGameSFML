@@ -32,13 +32,18 @@ public:
 
 };
 
-class Game : public sf::Drawable, public IGameEventListener, public IGameEventMaker
+class Game : 
+	public sf::Drawable, 
+	public IGameEventListener, 
+	public IGameEventMaker
 {
 
 	friend class GameLoader;
 	friend class GameUpdater;
 
 private:
+
+	int lives_;
 
 	sf::Clock* game_clock_;
 	sf::Clock* clock_;
@@ -59,7 +64,9 @@ public:
 		view_(view),
 		window_(window),
 		clock_(new sf::Clock()),
-		game_clock_(new sf::Clock())
+		game_clock_(new sf::Clock()), 
+
+		lives_(3)
 	{
 		
 	}
@@ -113,6 +120,8 @@ public:
 			break;
 
 		case GameEventState::PlayerDied:
+			lives_--;
+			restartPlayer();
 			break;
 
 		case GameEventState::PlayerChanged:
@@ -120,7 +129,7 @@ public:
 			break;
 
 		case GameEventState::SetNewLevel:
-			setNewLevelUpdate();
+			restartPlayer();
 			break;
 		}
 
@@ -138,8 +147,13 @@ public:
 		}
 	}
 
-	void setNewLevelUpdate()
+	void restartPlayer()
 	{
+		if (lives_ == 0)
+		{
+			notifyListeners(GameEventState::GameOver);
+		}
+
 		player1_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
 		player2_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
 		main_player_ = player1_;
@@ -192,7 +206,7 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 		LevelManager::level->boss->update(time);
 	}
 
-	game->info_->update(game->main_player_->getHealth(), game->game_time_, game->main_player_->getGearsNum(), *game->view_);
+	game->info_->update(game->main_player_->getHealth(), game->lives_, game->game_time_, game->main_player_->getGearsNum(), *game->view_);
 	game->main_player_->update(time);
 }
 

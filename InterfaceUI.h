@@ -108,6 +108,7 @@ private:
 	gui::TextBlock* health_block_;
 	gui::TextBlock* time_block_;
 	gui::TextBlock* gears_block_;
+	gui::TextBlock* lives_;
 	gui::TextBlock* change_player_;
 
 public:
@@ -116,12 +117,14 @@ public:
 		health_block_(new gui::TextBlock(sf::Vector2f(0.0f, 50.0f), "Здоровье: ", window)),
 		time_block_(new gui::TextBlock(sf::Vector2f(0.0f, 100.0f), "Время: ", window)),
 		gears_block_(new gui::TextBlock(sf::Vector2f(0.0f, 150.0f), "Шестерни: ", window)),
-		change_player_(new gui::TextBlock(sf::Vector2f(0.0f, 200.0f), "Сменить персонажа", window))
+		lives_(new gui::TextBlock(sf::Vector2f(0.0f, 200), "Жизни: ", window)),
+		change_player_(new gui::TextBlock(sf::Vector2f(0.0f, 250.0f), "Сменить персонажа", window))
 	{
 		// Выключаем интерактивность у всех, кроме "Смена персонажа".
 		health_block_->disableInteractivity();
 		time_block_->disableInteractivity();
 		gears_block_->disableInteractivity();
+		lives_->disableInteractivity();
 
 		// Добавляем слушателя к "Сменить персонажа", чтобы знать, когда она нажмется и оповестить об этом игру.
 		change_player_->addListener(this);
@@ -132,6 +135,7 @@ public:
 		target.draw(*health_block_);
 		target.draw(*time_block_);
 		target.draw(*gears_block_);
+		target.draw(*lives_);
 		target.draw(*change_player_);
 	}
 
@@ -144,7 +148,7 @@ public:
 		}	
 	}
 
-	void update(int health, int time, int num_gears, sf::View& view)
+	void update(int health, int lives, int time, int num_gears, sf::View& view)
 	{
 
 		health_block_->setText("Здоровье: " + std::to_string(health));
@@ -156,7 +160,10 @@ public:
 		gears_block_->setText("Шестерни: " + std::to_string(num_gears));
 		gears_block_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 140.0f });
 
-		change_player_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 110.0f });
+		lives_->setText("Жизни:" + std::to_string(lives));
+		lives_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 110.0f });
+
+		change_player_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 80.0f });
 	}
 
 };

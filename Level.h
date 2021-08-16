@@ -131,8 +131,8 @@ private:
 				{
 				case 't':
 					blocks.push_back(new Block(position, size, BlockType::Ground));
-					blocks.push_back(new Block(sf::Vector2f{ x * 50.0f, y * 50.0f + 1 }, sf::Vector2f{ 50.0f, 48.0f }, BlockType::Border));
-					blocks.push_back(new Block(sf::Vector2f{ x * 50.0f, y * 50.0f + 49 }, sf::Vector2f{ 50.0f, 1.0f }, BlockType::Ground));
+					//blocks.push_back(new Block(sf::Vector2f{ x * 50.0f, y * 50.0f + 1 }, sf::Vector2f{ 50.0f, 48.0f }, BlockType::Border));
+					//blocks.push_back(new Block(sf::Vector2f{ x * 50.0f, y * 50.0f + 49 }, sf::Vector2f{ 50.0f, 1.0f }, BlockType::Ground));
 					break;
 				case 'p':
 					blocks.emplace_back(new Block(position, size, BlockType::Spikes));
@@ -187,7 +187,7 @@ public:
 				// В зависимости от элемента обрезаем текстуру.
 				switch (tileMap[y][x])
 				{
-				case ' ':
+				case '-':
 					sprite_->setTextureRect(sf::IntRect(0, 0, 50, 50));
 					break;
 				case 't':
