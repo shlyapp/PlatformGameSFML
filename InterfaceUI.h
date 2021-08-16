@@ -3,7 +3,10 @@
 //////////////////////////////////////////////////////////////
 /// Класс Menu занимается отображением главного меню и кнопок.
 //////////////////////////////////////////////////////////////
-class Menu : public sf::Drawable, public gui::IEventListener, public IGameEventMaker
+class Menu : 
+	public sf::Drawable, 
+	public gui::IEventListener, 
+	public IGameEventMaker
 {
 private:
 
@@ -164,6 +167,50 @@ public:
 		lives_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 110.0f });
 
 		change_player_->setPosition(view.getCenter() - sf::Vector2f{ 270.0f, 80.0f });
+	}
+
+};
+
+class GameOverMenu :
+	public sf::Drawable,
+	public gui::IEventListener,
+	public IGameEventMaker
+{
+private:
+
+	sf::Texture texture_;
+	sf::Sprite sprite_;
+
+	gui::TextBlock* new_game_;
+
+	void loadFiles()
+	{
+		texture_.loadFromFile("data/images/menu.png");
+		sprite_.setTexture(texture_);
+	}
+
+public:
+
+	GameOverMenu(sf::RenderWindow* window) :
+		new_game_(new gui::TextBlock(sf::Vector2f(520, 300), "Начать заново.", window))
+	{
+		loadFiles();
+		new_game_->addListener(this);
+		new_game_->setCharacterSize(50);
+	}
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
+	{
+		target.draw(sprite_);
+		target.draw(*new_game_);
+	}
+
+	void updateByGUIEvent(gui::EventType event, const gui::Element* element) override
+	{
+		if (event == gui::EventType::Click)
+		{
+			notifyListeners(GameEventState::RestartGame);
+		}
 	}
 
 };

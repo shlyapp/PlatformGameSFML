@@ -436,7 +436,7 @@ public:
 		if (acceleration_.y > 0)
 		{
 			enemy.dealDamage(damage_);
-			speed_.y = -28;
+			speed_.y = -28 / (4 / 2) / 2 + 2 / 4;
 		}
 		else
 		{
@@ -452,6 +452,7 @@ public:
 			on_ground_ = true;
 			speed_.y = 0;
 			anim_state_ = AnimationState::Stay;
+
 		}
 	}
 

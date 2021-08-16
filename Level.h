@@ -351,4 +351,10 @@ public:
 		nt.levelsOver();
 	}
 
+	static void setLevel(const int num_level)
+	{
+		num_level_ = num_level;
+		level = levels_[num_level_];
+	}
+
 };

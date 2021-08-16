@@ -8,6 +8,7 @@ enum class GameEventState
 {
 	None,
 	inMenu,
+	RestartGame,
 	StartGame,
 	inGame,
 	PlayerDied,
@@ -57,6 +58,9 @@ protected:
 			{
 			case GameEventState::StartGame:
 				std::cout << "start game!\n";
+				break;
+			case GameEventState::RestartGame:
+				std::cout << "restart game!\n";
 				break;
 			case GameEventState::PlayerChanged:
 				std::cout << "player changed!\n";

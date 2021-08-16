@@ -3,7 +3,10 @@
 //////////////////////////////////////////////////////////////
 /// Класс Scene отвечает за отрисовку игру и меню, конца игры.
 //////////////////////////////////////////////////////////////
-class Scene : public sf::Drawable, public IGameEventListener
+class Scene : 
+	public sf::Drawable, 
+	public IGameEventListener,
+	public IGameEventMaker
 {
 private:
 
@@ -21,14 +24,20 @@ private:
 	// Обьекты сцены.
 	Menu* menu_;
 	Game* game_;
+	GameOverMenu* game_over_;
 
 	sf::View view_;
-	
+	sf::RenderWindow* window_;
+
+	sf::View view;
+
 public:
 
 	Scene(sf::RenderWindow* window) :
 		menu_(new Menu("data/images/menu.png", "data/images/info.png", window)),
 		game_(new Game(window, &view_)),
+		game_over_(new GameOverMenu(window)),
+		window_(window),
 		state_(SceneState::InMenu)
 	{
 		//////////////////////////////////////////////////////////////
@@ -38,6 +47,8 @@ public:
 		//////////////////////////////////////////////////////////////
 		menu_->addListener(game_);
 		menu_->addListener(this);
+
+		view.reset(sf::FloatRect(0, 0, 1280, 720));
 	}
 
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
@@ -53,6 +64,8 @@ public:
 			target.setView(view_);
 			break;
 		case SceneState::GameOver:
+			target.draw(*game_over_);
+			target.setView(view);
 			break;
 		default:
 			break;
@@ -71,7 +84,13 @@ public:
 		// Если игра закончилась, то изменяем на "Игра окончена."
 		if (event == GameEventState::GameOver)
 		{
+			window_->setView(view);
 			state_ = SceneState::GameOver;
+		}
+		
+		if (event == GameEventState::RestartGame)
+		{
+			state_ = SceneState::InGame;
 		}
 	}
 

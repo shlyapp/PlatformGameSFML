@@ -134,6 +134,10 @@ public:
 		case GameEventState::SetNewLevel:
 			restartPlayer();
 			break;
+
+		case GameEventState::RestartGame:
+			restartGame();
+			break;
 		}
 
 	}
@@ -160,6 +164,14 @@ public:
 		player1_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
 		player2_ = new Player(LevelManager::level->start_position, { 49, 112 }, view_, "data/images/player.png");
 		main_player_ = player1_;
+	}
+
+	void restartGame()
+	{
+		game_clock_->restart();
+
+		lives_ = 3;
+		LevelManager::setLevel(0);
 	}
 
 };

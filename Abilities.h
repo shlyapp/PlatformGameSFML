@@ -148,6 +148,8 @@ private:
 	{
 		texture_.loadFromFile(path_texture);
 		sprite_.setTexture(texture_);
+
+		texture_.setSmooth(true);
 	}
 
 protected:
