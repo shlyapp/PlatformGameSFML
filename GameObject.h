@@ -692,6 +692,7 @@ public:
 			{
 				it = bullets_.erase(it);
 				delete bullet;
+				break;
 			}
 		}
 
