@@ -265,4 +265,5 @@ namespace gui
 			target.draw(text_);
 		}
 	};
+
 }
