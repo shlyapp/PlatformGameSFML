@@ -171,6 +171,10 @@ public:
 
 };
 
+//////////////////////////////////////////////////////////////
+/// Этот класс отвечает за вывод картинки с кнопкой возможности
+/// начать игру занаво.
+//////////////////////////////////////////////////////////////
 class GameOverMenu :
 	public sf::Drawable,
 	public gui::IEventListener,
@@ -178,11 +182,14 @@ class GameOverMenu :
 {
 private:
 
+	// Просто спрайт меню.
 	sf::Texture texture_;
 	sf::Sprite sprite_;
 
+	// Кнопка начало игры снова.
 	gui::TextBlock* new_game_;
 
+	// Загрузка файлов.
 	void loadFiles()
 	{
 		texture_.loadFromFile("data/images/menu.png");
@@ -195,29 +202,39 @@ public:
 		new_game_(new gui::TextBlock(sf::Vector2f(500, 300), "Начать заново.", window))
 	{
 		loadFiles();
+		// Добавляем слушателя к кнопке, чтобы знать, если она нажата.
 		new_game_->addListener(this);
 		new_game_->setCharacterSize(50);
 	}
 
+	// Рисуем спрайт и кнопку.
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
 		target.draw(sprite_);
 		target.draw(*new_game_);
 	}
 
+	// Получаем обновление состояния кнопки.
 	void updateByGUIEvent(gui::EventType event, const gui::Element* element) override
 	{
+		// Если кликнули.
 		if (event == gui::EventType::Click)
 		{
+			// Перезапускаем игру.
 			notifyListeners(GameEventState::RestartGame);
 		}
 	}
 
 };
 
+//////////////////////////////////////////////////////////////
+/// Этот класс отвечает за победное меню.
+//////////////////////////////////////////////////////////////
 class WinMenu : public sf::Drawable
 {
 private:
+
+	// Аналогично предыдущему классу, только без активной кнопки.
 
 	sf::Texture texture_;
 	sf::Sprite sprite_;
@@ -248,10 +265,15 @@ public:
 
 };
 
+//////////////////////////////////////////////////////////////
+/// Этот класс отвечает за вывод информации о боссе.
+//////////////////////////////////////////////////////////////
 class BossInfoBar : public sf::Drawable
 {
 private:
 	
+	// Аналогия класса с выводом информации о персонаже.
+
 	gui::TextBlock* health_;
 
 public:
