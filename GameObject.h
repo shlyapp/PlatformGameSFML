@@ -462,7 +462,7 @@ public:
 
 	void handlingCollision(MovingPlatform& platform) override
 	{
-		if (getRect2f().y.y <= platform.getRect2f().y.y && speed_.x >= 0)
+		if (getRect2f().y.y <= platform.getRect2f().y.y)
 		{
 			position_.y -= speed_.y;
 			on_ground_ = true;
