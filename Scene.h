@@ -28,9 +28,10 @@ private:
 	GameOverMenu* game_over_;
 	WinMenu* win_menu_;
 
-	sf::View view_;
 	sf::RenderWindow* window_;
 
+	// Два вида для игры и меню отдельно.
+	sf::View view_;
 	sf::View view_menu_;
 
 public:
@@ -59,18 +60,23 @@ public:
 		// В зависимости от состояния отрисовываем либо меню, либо игру, либо экран завершения.
 		switch (state_)
 		{
+			// Если меню, то выводим меню и устанавливаем соответствующий вид.
 		case SceneState::InMenu:
 			target.draw(*menu_);
 			target.setView(view_menu_);
 			break;
+
+			// По логике дальше.
 		case SceneState::InGame:
 			target.draw(*game_);
 			target.setView(view_);
 			break;
+
 		case SceneState::GameOver:
 			target.draw(*game_over_);
 			target.setView(view_menu_);
 			break;
+
 		case SceneState::WinGame:
 			target.draw(*win_menu_);
 			target.setView(view_menu_);
@@ -90,15 +96,16 @@ public:
 		// Если игра закончилась, то изменяем на "Игра окончена."
 		if (event == GameEventState::GameOver)
 		{
-			//window_->setView(view);
 			state_ = SceneState::GameOver;
 		}
 		
+		// Если рестарт игры, то обновляем сцену.
 		if (event == GameEventState::RestartGame)
 		{
 			state_ = SceneState::InGame;
 		}
 
+		// Если победа, то надо вывести окно с победой.
 		if (event == GameEventState::WinGame)
 		{
 			state_ = SceneState::WinGame;
@@ -106,4 +113,3 @@ public:
 	}
 
 };
-
