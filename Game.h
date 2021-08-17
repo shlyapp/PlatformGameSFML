@@ -17,7 +17,7 @@ public:
 
 };
 
-class GameUpdater
+class GameUpdater : public IGameEventMaker
 {
 private:
 
@@ -183,6 +183,8 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 {
 	// Обновляем и проверяем на столкновение.
 
+	game->main_player_->update(time);
+
 	for (auto block : LevelManager::level->map->blocks)
 	{
 		if (game->main_player_->getRect2f() & block->getRect2f())
@@ -264,7 +266,11 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 	}
 
 	game->info_->update(game->main_player_->getHealth(), game->lives_, game->game_time_, game->main_player_->getGearsNum(), *game->view_);
-	game->main_player_->update(time);
+
+	if (!LevelManager::level->boss->isLive())
+	{
+		notifyListeners(GameEventState::WinGame);
+	}
 }
 
 inline void GameLoader::loadGame(Game* game, sf::View* view)

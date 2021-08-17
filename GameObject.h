@@ -78,6 +78,7 @@ protected:
 	// Значением смещения (чтобы ноги персонажа были на земле).
 	const sf::Vector2f SPRITE_POSITION_INACCUARACY = { 0.0f, 20.0f };
 
+	// Здоровье и урон.
 	float health_;
 	float damage_;
 
@@ -93,17 +94,23 @@ protected:
 
 public:
 
+	// Виртуальная функция, наследник должен обязательно реализовать ее.
 	virtual void update(const float time) = 0;
 
+	// Нанесение урона кем-то.
 	void dealDamage(const float value)
 	{
+		// Уменьшаем здоровье.
 		health_ -= value;
 
+		// Если ноль, то мертв.
 		if (health_ <= 0)
 		{
 			is_live_ = false;
 		}
 	}
+
+	// Геттера и сеттеры для получения и установки значений.
 
 	float getDamageValue() const
 	{
@@ -280,8 +287,11 @@ public:
 			}
 		}
 
+		// Движем персонажа.
 		IMoveAble::updateByMove();
+		// Ставим в нужную позицию, не забываем добавить погрешность, чтобы обьект был чуть ниже, касался земли.
 		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
+		// Меняем кадр анимации.
 		changeFrameAnimation(time);
 	}
 };
@@ -311,6 +321,7 @@ private:
 	// Проверка на столкновение с краями карты.
 	void handlingCollisionWithBorder()
 	{
+		// Если выходит за границу, то ставим крайнюю позицию.
 		if (LevelManager::level->map->size.x * 50 - size_.x < this->position_.x)
 		{
 			setPosition(sf::Vector2f(LevelManager::level->map->size.x * 50 - size_.x, getPosition().y));
@@ -342,28 +353,32 @@ public:
 
 	}
 
+	// Деструктор, срабатывает при удалении обьекта.
 	~Player()
 	{
 		gears_ = 0;
-		std::cout << gears_ << std::endl;
 	}
 
 	// Обвление персонажа, тут происходит логика движения.
 	void update(const float time) override
 	{
+		// Если мертв, то оповещаем игру о смерти главного героя.
 		if (is_live_ == false)
 		{
 			notifyListeners(GameEventState::PlayerDied);
 		}
 
+		// Изначально подразумевается, что игрок не на земле, поэтому делаем ускорение в низ.
 		acceleration_.y += 0.02f;
 		speed_.x = 0;
 
+		// Если он на земле, то убираем ускорение.
 		if (on_ground_ && anim_state_ == AnimationState::Stay)
 		{
 			acceleration_ = { 0, 0 };
 		}
 
+		// Прыжок.
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && on_ground_)
 		{
 			anim_state_ = AnimationState::Jump;
@@ -374,6 +389,7 @@ public:
 			if (on_ground_) anim_state_ = AnimationState::Jump;
 		}
 
+		// Движение по стрелкам.
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			anim_state_ = AnimationState::MoveRight;
@@ -385,14 +401,19 @@ public:
 			speed_.x = -speed_value_;
 		}
 
+		// Проверяем на столковние с границами карты.
 		handlingCollisionWithBorder();
 
+		// Обновляем движение.
 		IMoveAble::updateByMove();
 
+		// Уставливаем спрайт.
 		sprite_.setPosition(position_ + SPRITE_POSITION_INACCUARACY);
 
+		// Меняем кадр анимации.
 		changeFrameAnimation(time);
 
+		// Обновляем камеру.
 		camera_.updateByPosition(position_);
 	}
 
@@ -401,6 +422,7 @@ public:
 	{
 		switch (block.getType())
 		{
+			// Если блок - Земля, то стопорим падение.
 		case BlockType::Ground:
 			if (getRect2f().y.y < block.getRect2f().y.y)
 			{
@@ -410,8 +432,10 @@ public:
 				anim_state_ = AnimationState::Stay;
 			}
 			break;
+
+			// Столкновение с блоком.
 		case BlockType::Border:
-			if (speed_.x > 0)
+			if (speed_.x >= 0 )
 			{
 				position_.x = block.getRect2f().x.x - size_.x;
 			}
@@ -420,6 +444,8 @@ public:
 				position_.x = block.getRect2f().y.x;
 			}
 			break;
+
+			// Если блок шипы, то наносим себе урон в 5 единиц.
 		case BlockType::Spikes:
 			dealDamage(5);
 			break;
@@ -429,37 +455,51 @@ public:
 		}
 	}
 
+	// Столкновение с предметами.
 	void handlingCollision(Item& item) override
 	{
+		// Если шестерня.
 		if (item.getType() == ItemType::Gear)
 		{
+			// Увеличиваем количество шестерней.
 			gears_++;
 
+			// Находим положение шестерни и зануляем его, делаем обычный блок.
 			LevelManager::level->map->changeSmbol(sf::Vector2f{ item.getRect2f().x.x / 50.0f, item.getRect2f().x.y / 50.0f }, '-');
 
+			// Деактивируем, чтобы в последующем знать, что такой обьект надо удалить.
 			item.deactivate();
 		}
 
+		// Если звезда.
 		if (item.getType() == ItemType::Star)
 		{
+			// Деактивируем для удаления.
 			item.deactivate();
+			// Ставим новый уровень.
 			LevelManager::setNewLevel();
 		}
 	}
 
+	// Столкновение с врагом.
 	void handlingCollision(Enemy& enemy) override
 	{
+		// Если прыгнул на врага.
 		if (speed_.y > 0)
 		{
+			// Наносим урон врагу.
 			enemy.dealDamage(damage_);
+			// Подпрыгиваем.
 			speed_.y = -15;
 		}
 		else
 		{
+			// Если не прыгнул, то наносим урон уже самому персонажу.
 			this->dealDamage(enemy.getDamageValue());
 		}
 	}
 
+	// Столкновение с движущейся платформой.
 	void handlingCollision(MovingPlatform& platform) override
 	{
 		if (getRect2f().y.y <= platform.getRect2f().y.y)
@@ -471,30 +511,36 @@ public:
 		}
 	}
 
+	// Столкновение с боссом, аналогично врагу.
 	void handlingCollision(GameEntity& boss) override
 	{
 		if (speed_.y > 0)
 		{
 			boss.dealDamage(damage_);
-			speed_.y = -15;
+			speed_.y = -20;
 		}
 		else
 		{
 			this->dealDamage(boss.getDamageValue());
 		}
 
+		// Если босс умер, то оповещаем игру о победе.
 		if (boss.getHealth() == 0)
 		{
 			notifyListeners(GameEventState::WinGame);
-		}
+		}		
 	}
 
+	// Геттер для получения значения количества шестерней.
 	int getGearsNum() const
 	{
 		return gears_;
 	}
 };
 
+//////////////////////////////////////////////////////////////
+/// Класс Bullet отрисовывает пулю и обновляет ее состояние.
+//////////////////////////////////////////////////////////////
 class Bullet :
 	public ICollisionWithPlayerAble,
 	public sf::Drawable,
@@ -503,12 +549,15 @@ class Bullet :
 {
 private:
 
+	// Жива ли пуля.
 	bool is_live_;
 
+	// Текстура (влево и вправо), спрайт.
 	inline static sf::Texture texture_;
 	inline static sf::Texture texture_forward_;
 	inline static sf::Sprite sprite_;
 
+	// Загружаем и провеяем на направление движения, в зависимости от него выставляем текстуру.
 	void loadFiles()
 	{
 		texture_.loadFromFile("data/images/bullet.png");
@@ -526,6 +575,7 @@ private:
 
 public:
 
+	// Направления.
 	enum Direction
 	{
 		Left,
@@ -534,6 +584,7 @@ public:
 
 	mutable Direction dir_;
 
+	// Констуктор.
 	Bullet(sf::Vector2f position, Direction dir) :
 		IMoveAble(6.0f),
 		Entity(position, sf::Vector2f{ 30.0f, 10.0f }),
@@ -544,25 +595,32 @@ public:
 		loadFiles();
 	}
 
+	// Рисуем спрайт пули.
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 	{
 		target.draw(sprite_);
 	}
 
+	// Обвляем пулю.
 	void update()
 	{
+		// Если летит вправо, то скорость положительная.
 		if (dir_ == Direction::Right)
 		{
 			speed_.x = speed_value_;
 		}
+		// Иначе скорость отрицательная.
 		else if (dir_ == Direction::Left)
 		{
 			speed_.x = -speed_value_;
 		}
 
+		// Обновляем движение.
 		IMoveAble::updateByMove();
+		// Устанавливаем спрайт в нужную позицию.
 		sprite_.setPosition(position_);
 
+		// Если вышла за пределы карты, то пуля "мертва", потом она удалится.
 		if (position_.x > LevelManager::level->map->size.x * 50)
 		{
 			is_live_ = false;
@@ -574,8 +632,10 @@ public:
 		}
 	}
 
+	// Проверка столкновения с игроком.
 	void handlingCollision(Player& player) override
 	{
+		// Наносим урон и убираем пулю.
 		player.dealDamage(50);
 		is_live_ = false;
 	}
@@ -587,6 +647,9 @@ public:
 
 };
 
+//////////////////////////////////////////////////////////////
+/// Класс Boss описывает главного боса, стрельбу, движение.
+//////////////////////////////////////////////////////////////
 class Boss :
 	public IAnimationAble,
 	public IShootAble,
@@ -596,14 +659,19 @@ class Boss :
 {
 private:
 
+	// Две контрольные позиции, между которыми он будет двигаться.
 	sf::Vector2f control_points_;
 
+	// Часы для получения времени.
 	sf::Clock clock_;
+	// Время выстрел, для паузы.
 	float time_shoot_;
+	// Аналогично время выздоровления.
 	float time_recovery_;
 
 public:
 
+	// Устанавливаем по умолчанию параметры.
 	Boss(float y, sf::Vector2f control_points, sf::Vector2f size, std::string path_texture) :
 		Entity(sf::Vector2f(control_points.x, y), size),
 		GameEntity(500, 1),
@@ -617,8 +685,10 @@ public:
 
 	}
 
+	// Метод создания пули.
 	void takeShoot() override
 	{
+		// В зависимости от направления движения босса, выставляем движение пули.
 		if (anim_state_ == AnimationState::MoveLeft)
 		{
 			bullets_.push_back(new Bullet(position_ + sf::Vector2f(0, size_.y / 2), Bullet::Direction::Left));
@@ -629,8 +699,10 @@ public:
 		}
 	}
 
+	// Обновление босса.
 	void update(const float time) override
 	{
+		// Если прошло 2 секунды с прошлого выстрела, то делаем новый выстрел и устанавливаем новое время выстрела.
 		if (clock_.getElapsedTime().asMilliseconds() > time_shoot_ + 2000)
 		{
 			takeShoot();
@@ -638,14 +710,15 @@ public:
 			time_shoot_ = clock_.getElapsedTime().asMilliseconds();
 		}
 
-		if (clock_.getElapsedTime().asSeconds() > time_recovery_ + 3)
+		// Аналогично с выздоровлением, но она происходит каждые 4 секунды.
+		if (clock_.getElapsedTime().asSeconds() > time_recovery_ + 4)
 		{
 			setHealth(getHealth() + 50);
 
 			time_recovery_ = clock_.getElapsedTime().asSeconds();
-
 		}
 
+		// Обновляем движение, как в классе врага.
 		if (anim_state_ == AnimationState::MoveRight)
 		{
 			if (position_.x > control_points_.y)
@@ -675,19 +748,25 @@ public:
 
 	}
 
+	// Метод для обновления всех пуль.
 	void updateBullets(Player& player)
 	{
+		// Проходимся по листу пуль.
 		for (auto it = bullets_.begin(); it != bullets_.end(); ++it)
 		{
 			Bullet* bullet = *it;
 
+			// Обновляем пулю.
 			bullet->update();
 
+			// Если пуля пересекла игрока.
 			if (bullet->getRect2f() & player.getRect2f())
 			{
+				// Вызываем соответствующий метод у пули.
 				bullet->handlingCollision(player);
 			}
 
+			// Если пуля уже "мертва", то удаляем ее.
 			if (!bullet->isLive())
 			{
 				it = bullets_.erase(it);
@@ -698,6 +777,7 @@ public:
 
 	}
 
+	// Рисуем босса и каждую пулю.
 	void draw(sf::RenderTarget& target, sf::RenderStates animation_state) const override
 	{
 		IAnimationAble::draw(target, animation_state);
