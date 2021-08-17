@@ -46,11 +46,13 @@ public:
 		return type;
 	}
 
+	// Деактивация для удаления.
 	void deactivate()
 	{
 		is_active_ = false;
 	}
 
+	// Получаем, активен предмет или нет.
 	bool isActive() const
 	{
 		return is_active_;
