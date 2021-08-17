@@ -88,7 +88,7 @@ protected:
 				break;
 			}
 
-
+			// Оповещаем слушателя.
 			for (auto listener : listeners_)
 			{
 				listener->updateByGameEvent(event);
@@ -98,11 +98,13 @@ protected:
 
 public:
 
+	// Добавляем слушателя.
 	void addListener(IGameEventListener* listener)
 	{
 		listeners_.push_back(listener);
 	}
 
+	// Удаляем слушателя.
 	void removeListener(IGameEventListener* listener)
 	{
 		listeners_.remove(listener);
