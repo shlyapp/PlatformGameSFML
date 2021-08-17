@@ -233,6 +233,7 @@ inline void GameUpdater::gameUpdate(const Game* game, float time)
 		{
 			it = LevelManager::level->enemys.erase(it);
 			delete enemy;
+			break;
 		}
 	}
 
